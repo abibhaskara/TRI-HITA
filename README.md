@@ -1,7 +1,7 @@
 # 🌿 TRI-HITA (Smart Plantation & Hydroponic Monitor)
 
 <p align="center">
-  <img src="src/assets/hydroponic-B_9CIY-c.jpg" alt="TRI-HITA Banner" width="100%" style="border-radius: 20px; box-shadow: 0 8px 30px rgba(12, 94, 74, 0.15); object-fit: cover; max-height: 280px;" />
+  <img src="https://res.cloudinary.com/dnbgczi9b/image/upload/v1780760460/logo-trihita_dv2muk.png" alt="TRI-HITA Banner" width="100%" style="border-radius: 20px; box-shadow: 0 8px 30px rgba(12, 94, 74, 0.15); object-fit: cover; max-height: 280px;" />
 </p>
 
 <div align="center">
