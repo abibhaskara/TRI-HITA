@@ -1,0 +1,107 @@
+/* ===== Stat Card — Clean Reference Style ===== */
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+
+.stat-card:hover {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Icon — circular with tinted bg */
+.stat-card__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    background: rgba(12, 94, 74, 0.1);
+    color: #0c5e4a;
+}
+
+.stat-card--compact .stat-card__icon {
+    width: 34px;
+    height: 34px;
+    margin-bottom: 8px;
+}
+
+/* Value */
+.stat-card__value {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #1a1a1a;
+    margin-bottom: 2px;
+    letter-spacing: -0.02em;
+}
+
+.stat-card--compact .stat-card__value {
+    font-size: 18px;
+}
+
+.stat-card__unit {
+    font-size: 12px;
+    font-weight: 400;
+    color: #999;
+}
+
+/* Label */
+.stat-card__label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #999;
+}
+
+/* Trend */
+.stat-card__trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0c5e4a;
+    margin-top: 4px;
+}
+
+.stat-card__trend--down {
+    color: #dc6b6b;
+}
+
+/* Status indicators */
+.stat-card--warning {
+    border-left: 3px solid #e6a817;
+}
+
+.stat-card--warning .stat-card__icon {
+    background: rgba(230, 168, 23, 0.1);
+    color: #e6a817;
+}
+
+.stat-card--danger {
+    border-left: 3px solid #dc6b6b;
+}
+
+.stat-card--danger .stat-card__icon {
+    background: rgba(220, 107, 107, 0.1);
+    color: #dc6b6b;
+}
+
+.stat-card--clickable {
+    cursor: pointer;
+}

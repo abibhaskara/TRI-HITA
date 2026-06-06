@@ -1,0 +1,108 @@
+/* ===== Sprinkler Control — Reference Style ===== */
+
+.sprinkler {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--surface-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.sprinkler--active {
+    border-color: rgba(12, 94, 74, 0.4);
+    background: rgba(255, 255, 255, 0.85);
+    /* More opaque when active */
+}
+
+.sprinkler__info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Icon */
+.sprinkler__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background: var(--surface-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.sprinkler--active .sprinkler__icon {
+    background: rgba(12, 94, 74, 0.1);
+}
+
+.sprinkler__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.sprinkler__name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1a1a1a;
+}
+
+.sprinkler__status {
+    font-size: 12px;
+    color: #888;
+    margin-top: 1px;
+}
+
+.sprinkler__status--on {
+    color: #0c5e4a;
+    font-weight: 500;
+}
+
+/* Wave progress bars */
+.sprinkler__wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    display: flex;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.sprinkler__wave-bar {
+    flex: 1;
+    height: 100%;
+    background: linear-gradient(90deg, #0c5e4a, #2ad1ab, #0c5e4a);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+    border-radius: 4px;
+}
+
+.sprinkler__wave-bar:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.sprinkler__wave-bar:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
