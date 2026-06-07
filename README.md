@@ -131,4 +131,3 @@ TRI-HITA APP/
 <p align="center" style="font-size: 13px; color: #7d9690;">
   Made with 💚 to preserve harmony with nature.
 </p>
-# TRI-HITA
