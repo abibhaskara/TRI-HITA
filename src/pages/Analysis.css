@@ -12,7 +12,7 @@
 /* ── Hero header ────────────────────────────────────────────────── */
 .page-hero {
     background: var(--bg-header);
-    padding: 52px 20px 24px;
+    padding: calc(52px + env(safe-area-inset-top)) 20px 24px;
     border-radius: 0 0 32px 32px;
     margin-bottom: -12px;
     position: relative;
@@ -40,7 +40,7 @@
     font-size: 11px;
     letter-spacing: 2px;
     font-weight: 600;
-    color: rgba(255,255,255,0.5);
+    color: rgba(255,255,255,0.7);
     text-transform: uppercase;
 }
 
@@ -57,7 +57,7 @@
 
 .page-hero__sub {
     font-size: 13px;
-    color: rgba(255,255,255,0.5);
+    color: rgba(255,255,255,0.75);
     margin-top: 6px;
     position: relative;
     z-index: 1;
@@ -104,7 +104,7 @@
 
 .pg-section-action {
     font-size: 12px;
-    color: #888;
+    color: var(--text-accent);
 }
 
 /* ── White card ─────────────────────────────────────────────────── */
@@ -176,11 +176,19 @@
     padding: 14px 16px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.05);
     cursor: pointer;
-    transition: transform 0.18s, box-shadow 0.18s;
     outline: none;
     -webkit-tap-highlight-color: transparent;
+    /* Smooth morphing — no bounce */
+    transition:
+        border-radius  380ms var(--ease-out-expo, cubic-bezier(0.19,1,0.22,1)),
+        padding        340ms var(--ease-out-expo, cubic-bezier(0.19,1,0.22,1)),
+        box-shadow     240ms ease,
+        transform      260ms var(--ease-out-expo, cubic-bezier(0.19,1,0.22,1));
 }
-.analysis__insight:hover { transform: translateX(3px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.analysis__insight:hover {
+    transform: translateX(3px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
 
 .analysis__insight-header {
     display: flex;
@@ -217,13 +225,38 @@
 .analysis__insight-chevron--open { transform: rotate(90deg); color: #0c5e4a; }
 
 .analysis__insight-desc {
-    margin-top: 10px;
+    margin-top: 0;
     font-size: 13px;
-    color: #777;
+    color: #555;
     line-height: 1.8;
-    padding-left: 48px;
     word-break: break-word;
+    display: grid;
+    /* animation set dynamically in JSX to sync with text length */
+}
+
+.analysis__insight-desc-inner {
+    overflow: hidden;
+    padding-left: 48px;
+    padding-top: 10px;
+}
+
+@keyframes smoothHeight {
+    from { grid-template-rows: 0fr; opacity: 0; transform: translateY(4px); }
+    to   { grid-template-rows: 1fr; opacity: 1; transform: translateY(0); }
+}
+
+/* Per-character reveal — no bounce */
+@keyframes insightCharReveal {
+    from { opacity: 0; transform: translateY(3px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.analysis__insight-char {
+    display: inline-block;
+    opacity: 0;
     white-space: pre-wrap;
+    animation: insightCharReveal 200ms var(--ease-out-expo, cubic-bezier(0.19,1,0.22,1)) forwards;
+    /* animationDelay set per-char via inline style */
 }
 
 .analysis__insight-loading {
@@ -297,7 +330,7 @@
 
 .analysis__zone-stat-label {
     font-size: 10px;
-    color: #bbb;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: 600;
@@ -363,14 +396,14 @@
 .forecast-temp-val {
     font-size: 42px;
     font-weight: 800;
-    color: #0c5e4a;
+    color: #111;
     line-height: 1;
     letter-spacing: -1px;
 }
 .forecast-temp-unit {
     font-size: 18px;
     font-weight: 800;
-    color: #0c5e4a;
+    color: #111;
     margin-top: 2px;
     margin-left: 1px;
 }
@@ -383,17 +416,17 @@
 .forecast-desc-label {
     font-size: 9px;
     font-weight: 800;
-    color: #7d9690;
+    color: #111;
     letter-spacing: 1px;
 }
 .forecast-desc-day {
     font-size: 13px;
     font-weight: 700;
-    color: #2f4a43;
+    color: #111;
 }
 .forecast-desc-cond {
     font-size: 11px;
-    color: #7d9690;
+    color: #333;
     font-weight: 600;
 }
 
@@ -421,12 +454,12 @@
 .forecast-stat-val {
     font-size: 13px;
     font-weight: 800;
-    color: #0c5e4a;
+    color: #111;
     line-height: 1.2;
 }
 .forecast-stat-lbl {
     font-size: 8px;
-    color: #7d9690;
+    color: #444;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -448,7 +481,7 @@
     border-radius: 10px;
     font-size: 11px;
     font-weight: 700;
-    color: #7d9690;
+    color: #333;
     text-align: center;
     transition: all 0.25s ease;
     cursor: pointer;
@@ -517,7 +550,7 @@
 .forecast-daily-day {
     font-size: 11px;
     font-weight: 700;
-    color: #2f4a43;
+    color: #111;
 }
 .forecast-daily-emoji {
     font-size: 20px;
@@ -529,8 +562,8 @@
     font-weight: 700;
 }
 .forecast-daily-temp-max {
-    color: #0c5e4a;
+    color: #111;
 }
 .forecast-daily-temp-min {
-    color: #7d9690;
+    color: #555;
 }

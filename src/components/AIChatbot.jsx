@@ -1,41 +1,59 @@
-import { useState, useRef, useEffect } from 'react';
-import { Bot, X, Send, Loader2, Sparkles, ChevronDown } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { Bot, X, Send, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useData } from '../context/DataContext';
 import { useUser } from '../context/UserContext';
 import { useLang } from '../context/LanguageContext';
+import { parseGeminiError, executeWithGeminiFallback } from '../lib/geminiUtils';
 import './AIChatbot.css';
 
-const QUICK_PROMPTS = [
-    "Analyze the overall plantation health.",
-    "Are there any irrigation risks today?",
-    "Project harvest readiness.",
-];
+function buildSystemContext(sensorData, esp32Data, healthScore, zones, alerts, harvestInfo, realWeather, lang, esp32Connected, cropProfile) {
+    const fallbackMsg = lang === 'id'
+        ? 'tergantung jenis tanaman'
+        : lang === 'ban'
+            ? 'manut soroh tanaman'
+            : 'dependent on the crop type';
 
-function buildSystemContext(sensorData, esp32Data, healthScore, zones, alerts, harvestInfo, realWeather, lang, esp32Connected, backendConnected) {
-    const zonesSummary = zones.map(z =>
-        `Zone ${z.id} (${z.name}): ${z.area}, ${z.trees} trees, status=${z.status}`
-    ).join('; ');
-
-    const alertsSummary = alerts
-        .filter(a => !a.read)
-        .map(a => `[${a.type.toUpperCase()}] ${a.title}`)
-        .join('; ') || 'No active alerts';
+    const optMoisture = cropProfile?.optimalMoisture || fallbackMsg;
+    const optTemp     = cropProfile?.optimalTemp     || fallbackMsg;
+    const optHumidity = cropProfile?.optimalHumidity || fallbackMsg;
 
     const weatherContext = realWeather?.description != null
-        ? `Location: ${realWeather.city || 'Unknown'}. Condition: ${realWeather.description}, Wind: ${realWeather.windSpeed} km/h`
-        : `Simulated weather active.`;
+        ? (lang === 'id'
+            ? `Lokasi: ${realWeather.city || 'Tidak Diketahui'}. Kondisi: ${realWeather.description}, Angin: ${realWeather.windSpeed} km/h`
+            : lang === 'ban'
+                ? `Genah: ${realWeather.city || 'Nenten Kauningin'}. Kondisi: ${realWeather.description}, Angin: ${realWeather.windSpeed} km/h`
+                : `Location: ${realWeather.city || 'Unknown'}. Condition: ${realWeather.description}, Wind: ${realWeather.windSpeed} km/h`)
+        : (lang === 'id' ? 'Cuaca simulasi aktif.' : lang === 'ban' ? 'Cuaca simulasi aktif.' : 'Simulated weather active.');
 
-    const currentTemp = sensorData.temperature != null ? sensorData.temperature : (esp32Connected ? esp32Data.temperature : null);
-    const currentHumidity = sensorData.humidity != null ? sensorData.humidity : (esp32Connected ? esp32Data.humidity : null);
+    const currentTemp     = sensorData.temperature ?? (esp32Connected ? esp32Data.temperature : null);
+    const currentHumidity = sensorData.humidity    ?? (esp32Connected ? esp32Data.humidity    : null);
 
-    return `You are TRI-HITA AI, an expert Agronomist and Data Analyst for a smart palm oil plantation.
-Your core directive is to ANALYZE the provided telemetric data, IDENTIFY correlations, PREDICT risks (e.g., pests, drought), and RECOMMEND specific, actionable interventions. Do not just repeat the data — interpret it.
+    const cropName    = cropProfile?.cropName    || (lang === 'id' ? 'Tanaman Umum'          : lang === 'ban' ? 'Tanduran Umum'          : 'General Crop');
+    const cropVariety = cropProfile?.variety     || (lang === 'id' ? 'Standar'               : lang === 'ban' ? 'Standar'               : 'Standard');
+    const growthStage = cropProfile?.growthStage || (lang === 'id' ? 'Tahap Tidak Diketahui' : lang === 'ban' ? 'Tahap Nenten Kauningin' : 'Unknown Stage');
+
+    const harvestCycleText = lang === 'id'
+        ? `Siklus berjalan: Hari ke-${harvestInfo.currentDay}/${harvestInfo.totalCycleDays || 'N/A'}. Estimasi menuju panen optimal: ${harvestInfo.daysToHarvest} hari.`
+        : lang === 'ban'
+            ? `Siklus sane mamargi: Rahina kaping-${harvestInfo.currentDay}/${harvestInfo.totalCycleDays || 'N/A'}. Estimasi nuju panen optimal: ${harvestInfo.daysToHarvest} rahina.`
+            : `Active cycle: Day ${harvestInfo.currentDay}/${harvestInfo.totalCycleDays || 'N/A'}. Estimated days to optimal harvest: ${harvestInfo.daysToHarvest} days.`;
+
+    return `You are TRI-HITA AI, an expert Agronomist and Data Analyst for a smart agriculture facility specialized in cultivating [${cropName}] (Variety: ${cropVariety}).
+Your core directive is to ANALYZE the provided telemetric data, IDENTIFY correlations based on the specific needs of this crop, PREDICT environmental risks, and RECOMMEND actionable interventions.
+
+### CROP PROFILE & CONTEXT
+- Crop Type: ${cropName}
+- Variety: ${cropVariety}
+- Current Growth Stage: ${growthStage}
+- User Defined Optimal Soil Moisture: ${optMoisture}%
+- User Defined Optimal Temperature: ${optTemp}°C
+- User Defined Optimal Humidity: ${optHumidity}%
 
 ### LIVE TELEMETRY STREAM
-- Soil Moisture: ${sensorData.soilMoisture != null ? sensorData.soilMoisture.toFixed(1) : 'N/A'}% (Optimal: 50-70%)
-- Temperature: ${currentTemp != null ? currentTemp.toFixed(1) : 'N/A'}°C (Optimal: 24-32°C)
-- Humidity: ${currentHumidity != null ? currentHumidity.toFixed(0) : 'N/A'}% (Optimal: 70-90%)
+- Soil Moisture: ${sensorData.soilMoisture != null ? sensorData.soilMoisture.toFixed(1) : 'N/A'}%
+- Temperature: ${currentTemp != null ? currentTemp.toFixed(1) : 'N/A'}°C
+- Humidity: ${currentHumidity != null ? currentHumidity.toFixed(0) : 'N/A'}%
 - UV Index: ${sensorData.uvIndex != null ? sensorData.uvIndex.toFixed(1) : 'N/A'}
 - Wind Speed: ${sensorData.windSpeed != null ? sensorData.windSpeed.toFixed(0) : 'N/A'} km/h
 - Overall Health Score: ${healthScore != null ? healthScore.toFixed(0) : 'N/A'}/100
@@ -45,49 +63,87 @@ Your core directive is to ANALYZE the provided telemetric data, IDENTIFY correla
 ${weatherContext}
 
 ### HARVEST PROJECTION
-Day ${harvestInfo.currentDay}/${harvestInfo.totalCycleDays}. Days until optimal harvest: ${harvestInfo.daysToHarvest}.
-
-### CRITICAL ALERTS
-${alertsSummary}
+${harvestCycleText}
 
 ### INSTRUCTIONS:
-1. Cross-reference soil moisture with rainfall/weather to advise on irrigation.
-2. Evaluate temperature/humidity interplay to assess pest/fungal risks (e.g., Ganoderma).
-3. Be concise, authoritative, and structure your analysis with bullet points and bold text for readability.
-4. If asked a general question, synthesize a brief "State of the Plantation" report.
+1. Cross-reference soil moisture with current weather and irrigation type to advise on watering schedules specific to ${cropName} at its ${growthStage} stage.
+2. Evaluate temperature/humidity interplay to assess climate stress or general disease vectors relevant to this specific crop.
+3. If user parameters are set to "dependent on the crop type" or any translated fallback, use your internal agronomist database to judge whether the live telemetry is optimal for ${cropName}.
+4. Be concise, authoritative, and structure your analysis with bullet points and bold text for readability.
 5. Use emojis strategically to signify status (🟢 🟡 🔴).
-6. IMPORTANT: You must respond entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' : lang === 'ms' ? 'Malay (Bahasa Melayu)' : 'English'}.`;
+6. IMPORTANT: You must respond entirely and strictly in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' : lang === 'ban' ? 'Basa Bali (Balinese)' : 'English'}. Do not use English words or prefixes.`;
 }
 
 export default function AIChatbot() {
-    const { sensorData, zones, alerts, realWeather, esp32Data, healthScore, esp32Connected, backendConnected } = useData();
-    const { harvestInfo } = useUser();
+    const { sensorData, zones, alerts, realWeather, esp32Data, healthScore, esp32Connected } = useData();
+    const { harvestInfo, cropProfile } = useUser();
     const { lang, t } = useLang();
-    const [isOpen, setIsOpen] = useState(false);
-    const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
-    // const [chat, setChat] = useState(null);
-    const messagesEndRef = useRef(null);
-    const inputRef = useRef(null);
 
-    // Scroll to bottom
+    const quickPrompts = useMemo(() => [
+        t('prompt_health',    'Analyze the overall plantation health.'),
+        t('prompt_irrigation','Are there any irrigation risks today?'),
+        t('prompt_harvest',   'Project harvest readiness.'),
+    ], [t]);
+
+    const [isOpen, setIsOpen] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [messages,   setMessages]   = useState([]);
+    const [input,      setInput]      = useState('');
+    const [isLoading,  setIsLoading]  = useState(false);
+    const [error,      setError]      = useState(null);
+
+    const messagesEndRef = useRef(null);
+    const inputRef       = useRef(null);
+    const panelRef       = useRef(null);
+
+    // iOS Visual Viewport Keyboard Fix
+    useEffect(() => {
+        if (!window.visualViewport) return;
+
+        const handleVisualViewportChange = () => {
+            if (!panelRef.current) return;
+            const vv = window.visualViewport;
+
+            if (isOpen) {
+                let height, top;
+                if (isFullscreen) {
+                    height = vv.height;
+                    top = vv.offsetTop;
+                } else {
+                    const targetHeight = window.innerHeight * 0.8;
+                    height = Math.min(targetHeight, vv.height);
+                    top = vv.offsetTop + vv.height - height;
+                }
+
+                panelRef.current.style.top = `${top}px`;
+                panelRef.current.style.height = `${height}px`;
+                panelRef.current.style.bottom = 'auto';
+            } else {
+                panelRef.current.style.top = '';
+                panelRef.current.style.height = '';
+                panelRef.current.style.bottom = '';
+            }
+        };
+
+        window.visualViewport.addEventListener('resize', handleVisualViewportChange);
+        window.visualViewport.addEventListener('scroll', handleVisualViewportChange);
+        handleVisualViewportChange();
+
+        return () => {
+            window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
+            window.visualViewport.removeEventListener('scroll', handleVisualViewportChange);
+        };
+    }, [isOpen, isFullscreen]);
+
+    // Scroll to bottom on new messages
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isLoading]);
 
-    // Focus input on open
+    // Focus input when panel opens
     useEffect(() => {
         if (isOpen) setTimeout(() => inputRef.current?.focus(), 300);
     }, [isOpen]);
-
-    // Initialize Gemini 2.5 Flash
-    /*
-    const initChat = () => {
-        ...
-    };
-    */
 
     const sendMessage = async (text) => {
         const messageText = text || input.trim();
@@ -103,17 +159,21 @@ export default function AIChatbot() {
         try {
             const history = messages.map(m => ({
                 role: m.role === 'user' ? 'user' : 'model',
-                parts: [{ text: m.content }]
+                parts: [{ text: m.content }],
             }));
-
-            const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
-            const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ 
-                model: "gemini-2.5-flash",
-                systemInstruction: buildSystemContext(sensorData, esp32Data, healthScore, zones, alerts, harvestInfo, realWeather, lang, esp32Connected, backendConnected)
-            });
-            const chat = model.startChat({ history });
-            const result = await chat.sendMessage(messageText);
+            const result = await executeWithGeminiFallback(
+                {
+                    model: 'gemini-2.5-flash',
+                    systemInstruction: buildSystemContext(
+                        sensorData, esp32Data, healthScore, zones, alerts,
+                        harvestInfo, realWeather, lang, esp32Connected, cropProfile
+                    ),
+                },
+                async (model) => {
+                    const chat = model.startChat({ history });
+                    return await chat.sendMessage(messageText);
+                }
+            );
 
             setMessages(prev => [...prev, {
                 role: 'assistant',
@@ -121,14 +181,8 @@ export default function AIChatbot() {
                 id: Date.now() + 1,
             }]);
         } catch (err) {
-            console.error("Gemini Error:", err);
-            const is429 = err.message?.includes('429') || err.message?.includes('quota') || err.message?.includes('QUOTA');
-            const errMsg = err.message?.includes('API_KEY_INVALID')
-                ? '⚠️ API Key is invalid. Check VITE_GEMINI_API_KEY.'
-                : is429
-                    ? '⚠️ Project quota exhausted. Try again later...'
-                    : '⚠️ Analysis failed: ' + err.message;
-
+            console.error('Gemini Error:', err);
+            const errMsg = parseGeminiError(err, t);
             setError(errMsg);
             setMessages(prev => [...prev, {
                 role: 'assistant',
@@ -136,9 +190,6 @@ export default function AIChatbot() {
                 id: Date.now() + 1,
                 isError: true,
             }]);
-
-            // Force re-init on next message if it was a critical error like 429
-            // setChat(null);
         } finally {
             setIsLoading(false);
         }
@@ -153,35 +204,50 @@ export default function AIChatbot() {
 
     const handleReset = () => {
         setMessages([]);
-        // setChat(null);
         setError(null);
-        // initChat();
+    };
+
+    const handleInputFocus = () => {
+        setTimeout(() => {
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: 'smooth'
+            });
+        }, 100);
+        setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 200);
     };
 
     return (
         <>
-            <div className={`ai-chat-panel ${isOpen ? 'ai-chat-panel--open' : ''}`}>
+            <div
+                ref={panelRef}
+                className={`ai-chat-panel ${isOpen ? 'ai-chat-panel--open' : ''} ${isFullscreen ? 'ai-chat-panel--fullscreen' : ''}`}
+            >
                 <div className="ai-chat-header">
                     <div className="ai-chat-header__info">
-                        <div className="ai-chat-header__avatar">
-                            <Sparkles size={16} strokeWidth={1.5} />
-                        </div>
                         <div>
                             <div className="ai-chat-header__name">TRI-HITA AI Analyst</div>
-
+                            <div className="ai-chat-header__crop-tag" style={{ fontSize: '10px', opacity: 0.8 }}>
+                                {t('monitoring')}: {cropProfile?.cropName || t('general_crop')}
+                            </div>
                         </div>
                     </div>
                     <div className="ai-chat-header__actions">
                         {messages.length > 0 && (
-                            <button className="ai-chat-icon-btn" onClick={handleReset} title="Reset Analysis">
+                            <button className="ai-chat-icon-btn" onClick={handleReset} title={t('reset_analysis')}>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                                     <path d="M3 3v5h5" />
                                 </svg>
                             </button>
                         )}
-                        <button className="ai-chat-icon-btn" onClick={() => setIsOpen(false)}>
-                            <ChevronDown size={18} strokeWidth={2} />
+                        <button className="ai-chat-icon-btn" onClick={() => setIsFullscreen(!isFullscreen)}>
+                            {isFullscreen ? <ChevronDown size={18} strokeWidth={2} /> : <ChevronUp size={18} strokeWidth={2} />}
+                        </button>
+                        <button className="ai-chat-icon-btn" onClick={() => { setIsOpen(false); setIsFullscreen(false); }}>
+                            <X size={18} strokeWidth={2} />
                         </button>
                     </div>
                 </div>
@@ -189,15 +255,12 @@ export default function AIChatbot() {
                 <div className="ai-chat-messages">
                     {messages.length === 0 && (
                         <div className="ai-chat-empty">
-                            <div className="ai-chat-empty__icon">
-                                <Sparkles size={28} strokeWidth={1.5} />
-                            </div>
                             <div className="ai-chat-empty__title">{t('data_analysis_engine', 'Data Analysis Engine')}</div>
                             <div className="ai-chat-empty__desc">
-                                {t('monitoring_telemetry', 'I am monitoring the live telemetry of your plantation. Ask me to deeply analyze the structural health, yield projections, or environmental risks.')}
+                                {t('monitoring_telemetry', `I am monitoring the live telemetry of your ${cropProfile?.cropName || 'plantation'}. Ask me to deeply analyze the structural health, yield projections, or environmental risks.`)}
                             </div>
                             <div className="ai-chat-quick-prompts">
-                                {QUICK_PROMPTS.map((prompt, i) => (
+                                {quickPrompts.map((prompt, i) => (
                                     <button key={i} className="ai-chat-quick-btn" onClick={() => sendMessage(prompt)}>
                                         {prompt}
                                     </button>
@@ -210,29 +273,31 @@ export default function AIChatbot() {
                         <div key={msg.id} className={`ai-chat-message ai-chat-message--${msg.role} ${msg.isError ? 'ai-chat-message--error' : ''}`}>
                             {msg.role === 'assistant' && (
                                 <div className="ai-chat-message__avatar">
-                                    <Sparkles size={12} strokeWidth={1.5} />
+                                    <Bot size={12} strokeWidth={1.5} />
                                 </div>
                             )}
                             <div className="ai-chat-message__bubble ai-chat-message__bubble--markdown">
-                                {/* Basic markdown rendering for bold text and line breaks that Gemini uses */}
-                                {msg.content.split('\n').map((line, i) => (
-                                    <span key={i}>
-                                        {line.split(/(\*\*.*?\*\*)/).map((part, j) => {
-                                            if (part.startsWith('**') && part.endsWith('**')) {
-                                                return <strong key={j}>{part.slice(2, -2)}</strong>;
-                                            }
-                                            return part;
-                                        })}
-                                        <br />
-                                    </span>
-                                ))}
+                                {msg.content.split('\n').map((line, i) => {
+                                    const isBullet = line.trim().startsWith('- ') || line.trim().startsWith('* ');
+                                    const cleanLine = isBullet ? line.trim().substring(2) : line;
+                                    const renderedContent = cleanLine.split(/(\*\*.*?\*\*)/).map((part, j) =>
+                                        part.startsWith('**') && part.endsWith('**')
+                                            ? <strong key={j}>{part.slice(2, -2)}</strong>
+                                            : part
+                                    );
+                                    return (
+                                        <span key={i} style={{ display: 'block', marginBottom: '4px' }}>
+                                            {isBullet ? '• ' : ''}{renderedContent}
+                                        </span>
+                                    );
+                                })}
                             </div>
                         </div>
                     ))}
 
                     {isLoading && (
                         <div className="ai-chat-message ai-chat-message--assistant">
-                            <div className="ai-chat-message__avatar"><Sparkles size={12} strokeWidth={1.5} /></div>
+                            <div className="ai-chat-message__avatar"><Bot size={12} strokeWidth={1.5} /></div>
                             <div className="ai-chat-message__bubble ai-chat-message__bubble--loading">
                                 <span /><span /><span />
                             </div>
@@ -253,6 +318,8 @@ export default function AIChatbot() {
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
+                            onFocus={handleInputFocus}
+                            onClick={handleInputFocus}
                             rows={1}
                             disabled={isLoading}
                         />
@@ -275,7 +342,7 @@ export default function AIChatbot() {
             <button
                 className={`ai-chat-fab ${isOpen ? 'ai-chat-fab--open' : ''}`}
                 onClick={() => setIsOpen(v => !v)}
-                aria-label="Open AI Analyst"
+                aria-label={t('open_ai_analyst')}
             >
                 {isOpen ? <X size={22} strokeWidth={2} /> : <Bot size={22} strokeWidth={1.5} />}
             </button>

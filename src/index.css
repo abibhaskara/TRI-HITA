@@ -137,6 +137,23 @@
   --transition-base: 250ms ease;
   --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
 
+  /* Morphing — spring curve for size / shape changes */
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --transition-morph:
+    width          280ms var(--ease-spring),
+    height         280ms var(--ease-spring),
+    max-width      280ms var(--ease-spring),
+    max-height     360ms var(--ease-out-expo),
+    padding        260ms var(--ease-spring),
+    border-radius  300ms var(--ease-spring),
+    transform      240ms var(--ease-spring),
+    opacity        200ms ease,
+    box-shadow     220ms ease,
+    background     220ms ease,
+    color          180ms ease,
+    border-color   180ms ease;
+
   /* Layout — Golden Ratio */
   --nav-height: 68px;
   --max-width: 430px;
@@ -158,19 +175,26 @@ html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Trick: Top 50% is dark green, bottom 50% is white */
+  background-color: #ffffff;
+  background-image: linear-gradient(to bottom, #04241d 50%, #ffffff 50%);
+  background-repeat: no-repeat;
+  overscroll-behavior: auto;
 }
 
 body {
   font-family: var(--font-body);
   color: var(--text-primary);
-  background: #f5f5f5;
-  background-image: url('/bg-hydroponic.jpg');
-  background-size: cover;
-  background-position: center;
+  background: radial-gradient(circle at 50% 50%, #07352b 0%, #031410 100%);
+  background-image: 
+    radial-gradient(rgba(42, 209, 171, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, #07352b 0%, #031410 100%);
+  background-size: 24px 24px, 100% 100%;
   background-attachment: fixed;
   font-size: var(--text-base);
-  line-height: 1.5; /* Relaxed for better harmony with SF Pro */
+  line-height: 1.5;
   overflow-x: hidden;
+  overscroll-behavior: auto;
   min-height: 100vh;
   min-height: 100dvh;
 }
@@ -210,6 +234,69 @@ ol {
   list-style: none;
 }
 
+/* ===== Global Morphing Transition =====
+   Applies spring-based size transitions to all interactive elements.
+   Uses will-change: transform to keep GPU-composited where possible.
+   Properties that trigger layout (width/height/padding) use --ease-spring
+   so expanding elements feel snappy and alive instead of mechanical.
+   ======================================= */
+button,
+a,
+[role="button"],
+.toggle-slider,
+.toggle-slider::before,
+.badge,
+.glass-card,
+.settings__option,
+.settings__option--clickable,
+.settings__alert,
+.settings__select,
+.settings__loc-btn,
+.db-hero__pill,
+.db-hero__bell,
+.db-hero__account,
+.db-notif__item,
+.db-field-btn,
+.db-field-drop,
+.db-field-drop__item,
+.db-sensor,
+.db-ai,
+.db-harvest__fill,
+.db-range-tab,
+.db-icon-btn,
+.ai-chat-fab,
+.ai-chat-panel,
+.ai-chat-quick-btn,
+.ai-chat-send-btn,
+.ai-chat-icon-btn,
+.analysis__insight,
+.analysis__insight-icon,
+.analysis__insight-chevron,
+.forecast-tab {
+  transition: var(--transition-morph);
+  will-change: transform;
+}
+
+/* Expanding containers that use max-height reveal */
+.db-field-drop,
+.settings__alerts,
+.analysis__insight-desc,
+.ai-chat-empty,
+.ai-chat-messages {
+  transition:
+    max-height 360ms var(--ease-out-expo),
+    opacity    220ms ease,
+    transform  280ms var(--ease-spring);
+}
+
+/* Active / pressed scale feedback */
+button:active,
+[role="button"]:active,
+.db-hero__pill--clickable:active {
+  transform: scale(0.96);
+  transition-duration: 80ms;
+}
+
 /* ===== App Container ===== */
 .app-container {
   width: 100%;
@@ -218,12 +305,11 @@ ol {
   min-height: 100dvh;
   position: relative;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.3);
-  /* Transparent to show bg */
+  background: #f3f4f0;
   backdrop-filter: blur(8px);
-  /* Subtle overall blur */
   -webkit-backdrop-filter: blur(8px);
   box-shadow: 0 0 42px rgba(0, 0, 0, 0.1);
+  isolation: isolate;
 }
 
 /* ===== Fixed Overlay Wrapper ===== */

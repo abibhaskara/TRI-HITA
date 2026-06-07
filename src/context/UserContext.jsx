@@ -1,27 +1,24 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
 const STORAGE_KEY = 'tri-hita_user';
-
-const PLANT_TYPES = {
-  'Hydroponic System':    { cycleDays: 180, daysToHarvest: 30  },
-  'Banana':      { cycleDays: 90,  daysToHarvest: 15  },
-  'Dahlia':      { cycleDays: 60,  daysToHarvest: 10  },
-  'Succulent':   { cycleDays: 365, daysToHarvest: 60  },
-  'Pink Gerbera':{ cycleDays: 75,  daysToHarvest: 12  },
-  'Nest Fern':   { cycleDays: 120, daysToHarvest: 20  },
-  'Custom':      { cycleDays: 90,  daysToHarvest: 14  },
-};
-
-export { PLANT_TYPES };
 
 const DEFAULT_USER = {
   name: 'Farmer Tri-Hita',
   email: 'farmer@tri-hita.ai',
   avatarUrl: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Sophie',
-  plantName: 'My Hydroponic',
-  plantType: 'Hydroponic System',
-  plantedAt: new Date().toISOString(),
-  onboarded: true,
+  onboarded: false,
+  cropProfile: {
+    cropName: 'Tomato',
+    variety: 'Standard',
+    growthStage: 'Vegetative',
+    plantedAt: new Date().toISOString(),
+    cycleDays: 90,
+    irrigationMethod: 'Drip Irrigation',
+    useCustomThresholds: false,
+    optimalMoisture: 70,
+    optimalTemp: 28,
+    optimalHumidity: 80,
+  }
 };
 
 function loadUser() {
@@ -55,31 +52,27 @@ export function UserProvider({ children }) {
     setUser(DEFAULT_USER);
   }, []);
 
-  /** Computed harvest info derived from plant type & planted date */
-  const harvestInfo = (() => {
-    if (!user?.plantType || !user?.plantedAt) {
-      return { currentDay: 40, totalCycleDays: 50, daysToHarvest: 10 };
-    }
-    const baseData = PLANT_TYPES[user.plantType] || PLANT_TYPES['Custom'];
-    const totalCycleDays = (user.plantType === 'Custom' && user.customCycleDays) 
-      ? Number(user.customCycleDays) 
-      : baseData.cycleDays;
+  const cropProfile = useMemo(() => {
+    return user?.cropProfile || DEFAULT_USER.cropProfile;
+  }, [user?.cropProfile]);
 
-    const plantedDate = new Date(user.plantedAt);
+  const harvestInfo = useMemo(() => {
+    const plantedAt = cropProfile?.plantedAt || new Date().toISOString();
+    const totalCycleDays = Number(cropProfile?.cycleDays) || 90;
+    const plantedDate = new Date(plantedAt);
     const now = new Date();
     const msPerDay = 1000 * 60 * 60 * 24;
     const currentDay = Math.max(1, Math.floor((now - plantedDate) / msPerDay));
     const capped = Math.min(currentDay, totalCycleDays);
-    const daysLeft = Math.max(0, totalCycleDays - capped);
     return {
       currentDay: capped,
-      totalCycleDays: totalCycleDays,
-      daysToHarvest: daysLeft,
+      totalCycleDays,
+      daysToHarvest: Math.max(0, totalCycleDays - capped),
     };
-  })();
+  }, [cropProfile?.plantedAt, cropProfile?.cycleDays]);
 
   return (
-    <UserContext.Provider value={{ user, updateUser, logout, harvestInfo }}>
+    <UserContext.Provider value={{ user, updateUser, logout, harvestInfo, cropProfile }}>
       {children}
     </UserContext.Provider>
   );

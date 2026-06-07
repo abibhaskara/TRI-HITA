@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { LayoutDashboard, Brain, FileText, Settings } from 'lucide-react';
+import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { LayoutDashboard, Settings, User, FileText } from 'lucide-react';
 import { useNavDirection } from '../App';
 import { useLang } from '../context/LanguageContext';
 import './LivingNavbar.css';
 
 const navItems = [
+    { labelKey: 'nav_profile', path: '/account', icon: User },
     { labelKey: 'nav_dashboard', path: '/', icon: LayoutDashboard },
-    { labelKey: 'nav_analysis', path: '/analysis', icon: Brain },
+    { labelKey: 'nav_analysis', path: '/analysis', icon: FileText },
     { labelKey: 'nav_settings', path: '/settings', icon: Settings },
 ];
 
@@ -70,8 +71,8 @@ export default function LivingNavbar() {
                                             location.pathname === item.path ? 'living-navbar__item--active' : ''
                                         }`}
                                         animate={{
-                                            x: getHoverOffset(item.path),
-                                            scale: hoveredPath === item.path ? 1.1 : 1,
+                                            x: offset,
+                                            scale: isHovered ? 1.1 : 1,
                                             filter: 'blur(0px)',
                                         }}
                                         whileTap={{ scale: 0.95, filter: 'blur(2px)' }}

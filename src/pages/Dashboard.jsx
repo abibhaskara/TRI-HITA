@@ -1,10 +1,8 @@
-
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import {
   Droplets, Thermometer, Sun, Wind, Leaf, Zap, Bell,
-  ChevronDown, Calendar, X, Check, Plus, Wifi, Bluetooth,
-  MapPin, Activity, UserCircle
+  ChevronDown, Calendar, X, Check, Plus, MapPin, Activity, UserCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNavDirection } from '../App';
@@ -12,10 +10,11 @@ import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tool
 import { useData } from '../context/DataContext';
 import { useUser } from '../context/UserContext';
 import { useLang } from '../context/LanguageContext';
+import { parseGeminiError, executeWithGeminiFallback } from '../lib/geminiUtils';
 import './Dashboard.css';
 import hydroImg from '../assets/hydroponic.jpg';
 
-/* ── Chart data ──────────────────────────────────────────── */
+/* ── Static chart data ───────────────────────────────────────── */
 const TIME_RANGES = ['3D', '1W', '1M', 'Custom'];
 
 const SENSOR_HISTORY = {
@@ -44,30 +43,28 @@ const SENSOR_HISTORY = {
   ],
 };
 
-function generateDailyData() {
-  const data = [];
+// Generate once at module level (stable across renders)
+const DAILY_DATA = (() => {
   const now = new Date();
-  for (let i = 29; i >= 0; i--) {
+  return Array.from({ length: 30 }, (_, i) => {
     const d = new Date(now);
-    d.setDate(d.getDate() - i);
-    data.push({
+    d.setDate(d.getDate() - (29 - i));
+    return {
       time: `${d.getMonth() + 1}/${d.getDate()}`,
-      soil: Math.round(55 + Math.random() * 25),
-      uv: +(1.5 + Math.random() * 7).toFixed(1),
-    });
-  }
-  return data;
-}
-const DAILY_DATA = generateDailyData();
+      soil: 55 + ((i * 7 + 13) % 26),         // deterministic pseudo-random
+      uv:   parseFloat((1.5 + (i * 3 % 7)).toFixed(1)),
+    };
+  });
+})();
 
-/* ── Helpers ─────────────────────────────────────────────── */
+/* ── Helpers ─────────────────────────────────────────────────── */
 const fmt = (val, unit = '', decimals = 1) =>
   val != null ? `${parseFloat(val).toFixed(decimals)}${unit}` : null;
 
 function getHealthColor(score) {
   if (score == null) return '#9ca3af';
-  if (score >= 80) return '#22c55e';
-  if (score >= 60) return '#f59e0b';
+  if (score >= 80)   return '#22c55e';
+  if (score >= 60)   return '#f59e0b';
   return '#ef4444';
 }
 
@@ -75,43 +72,34 @@ export default function Dashboard() {
   const {
     realWeather, sensorData, alerts, markAlertRead,
     esp32Connected, esp32Data, healthScore, backendConnected,
+    startScan,
   } = useData();
-  const { user, harvestInfo } = useUser();
-  const { t } = useLang();
-  const navigate = useNavigate();
+  const { user, harvestInfo, cropProfile } = useUser();
+  const { lang, t } = useLang();
+  const navigate  = useNavigate();
   const { onNavChange } = useNavDirection();
 
-  const plantName = user?.plantName || 'Hydroponic';
-
-  const goToAccount = () => {
-    onNavChange('/account');
-    navigate('/account');
-  };
+  const plantName = cropProfile?.cropName || 'Hydroponic';
 
   /* ── State ───────────────────────────────────── */
   const [aiLoading, setAiLoading] = useState(false);
-  const [aiResult, setAiResult] = useState(null);
-  const [aiError, setAiError] = useState(null);
+  const [aiResult,  setAiResult]  = useState(null);
+  const [aiError,   setAiError]   = useState(null);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [scanOpen, setScanOpen] = useState(false);
-  const [scanPhase, setScanPhase] = useState('idle');
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [chartRange, setChartRange] = useState('1W');
-  const [chartDropOpen, setChartDropOpen] = useState(false);
+  const [chartRange,   setChartRange]   = useState('1W');
   const [customFrom, setCustomFrom] = useState('');
-  const [customTo, setCustomTo] = useState('');
+  const [customTo,   setCustomTo]   = useState('');
 
   /* ── Derived values ──────────────────────────── */
-  const isOnline = backendConnected || esp32Connected;
-  const unreadCount = alerts.filter(a => !a.read).length;
+  const isOnline    = backendConnected || esp32Connected;
+  const unreadCount = useMemo(() => alerts.filter(a => !a.read).length, [alerts]);
 
-  // Weather-sourced (OpenWeather)
   const weatherTemp     = sensorData.temperature;
   const weatherHumidity = sensorData.humidity;
   const weatherWind     = sensorData.windSpeed;
   const weatherUV       = sensorData.uvIndex;
 
-  // ESP32 preferred, OWM fallback
   const displayTemp     = esp32Connected && esp32Data.temperature != null ? esp32Data.temperature : weatherTemp;
   const displayHumidity = esp32Connected && esp32Data.humidity    != null ? esp32Data.humidity    : weatherHumidity;
 
@@ -119,106 +107,100 @@ export default function Dashboard() {
     ? Math.min(100, (harvestInfo.currentDay / harvestInfo.totalCycleDays) * 100)
     : 0;
 
-  const chartData = chartRange === 'Custom'
-    ? (customFrom && customTo ? DAILY_DATA.filter(d => {
-        const dt = new Date(d.time); return dt >= new Date(customFrom) && dt <= new Date(customTo);
-      }) : [])
-    : chartRange === '1M' ? DAILY_DATA : SENSOR_HISTORY[chartRange] || [];
+  const chartData = useMemo(() => {
+    if (chartRange === 'Custom') {
+      return (customFrom && customTo)
+        ? DAILY_DATA.filter(d => {
+            const dt = new Date(d.time);
+            return dt >= new Date(customFrom) && dt <= new Date(customTo);
+          })
+        : [];
+    }
+    return chartRange === '1M' ? DAILY_DATA : (SENSOR_HISTORY[chartRange] || []);
+  }, [chartRange, customFrom, customTo]);
+
+  /* ── Sensor tiles ────────────────────────────── */
+  const sensors = useMemo(() => [
+    {
+      icon: Droplets, label: t('soil'),
+      value: fmt(esp32Connected ? sensorData.soilMoisture : null, '%', 0),
+      unit: '%', rawVal: esp32Connected ? sensorData.soilMoisture : null,
+      ok: esp32Connected && sensorData.soilMoisture >= 60 && sensorData.soilMoisture <= 80,
+    },
+    {
+      icon: Leaf, label: t('health'),
+      value: healthScore != null ? `${Math.round(healthScore)}` : null,
+      unit: '/100', rawVal: healthScore,
+      ok: healthScore != null && healthScore >= 75,
+      color: getHealthColor(healthScore),
+    },
+    {
+      icon: Sun, label: t('uv'),
+      value: fmt(weatherUV, '', 1),
+      unit: '', rawVal: weatherUV,
+      ok: weatherUV != null && weatherUV <= 7,
+    },
+    {
+      icon: Thermometer, label: t('temp'),
+      value: fmt(displayTemp, '', 1),
+      unit: '°C', rawVal: displayTemp,
+      ok: displayTemp != null && displayTemp >= 24 && displayTemp <= 32,
+    },
+    {
+      icon: Droplets, label: t('humidity'),
+      value: fmt(displayHumidity, '', 0),
+      unit: '%', rawVal: displayHumidity,
+      ok: displayHumidity != null && displayHumidity >= 70 && displayHumidity <= 90,
+    },
+    {
+      icon: Wind, label: t('wind'),
+      value: fmt(weatherWind, '', 0),
+      unit: 'km/h', rawVal: weatherWind,
+      ok: weatherWind != null,
+    },
+  ], [t, esp32Connected, sensorData, healthScore, weatherUV, displayTemp, displayHumidity, weatherWind]);
 
   /* ── Actions ─────────────────────────────────── */
-  const startScan = () => {
-    setDropdownOpen(false);
-    setScanPhase('scanning');
-    setScanOpen(true);
-    setTimeout(() => setScanPhase('failed'), 3000);
-  };
-  const retryScan = () => { setScanPhase('scanning'); setTimeout(() => setScanPhase('failed'), 3000); };
-  const exitScan  = () => { setScanOpen(false); setScanPhase('idle'); };
-
-  const runAnalysis = async () => {
+  const runAnalysis = useCallback(async () => {
     if (aiLoading) return;
     setAiLoading(true); setAiResult(null); setAiError(null);
     try {
+      const noneText   = lang === 'id' ? 'Tidak ada' : lang === 'ban' ? 'Nenten wenten' : 'None';
       const activeAlerts = alerts.filter(a => !a.read)
-        .map(a => `[${a.type.toUpperCase()}] ${a.title}`).join('\n') || 'None';
-      const currentTemp     = displayTemp;
-      const currentHumidity = displayHumidity;
+        .map(a => `[${a.type.toUpperCase()}] ${a.title}`).join('\n') || noneText;
+
+      const prefixHealthy  = lang === 'id' ? 'SEHAT'     : lang === 'ban' ? 'BECIK'     : 'HEALTHY';
+      const prefixWarning  = lang === 'id' ? 'PERINGATAN': lang === 'ban' ? 'PERINGATAN': 'WARNING';
+      const prefixCritical = lang === 'id' ? 'KRITIS'    : lang === 'ban' ? 'KRITIS'    : 'CRITICAL';
+
       const prompt = `You are TRI-HITA AI, an expert agronomist. Analyze this real-time plantation data.
 
-Plant: ${user?.plantName || 'Hydroponic'} (${user?.plantType || 'Hydroponic System'})
+Plant: ${cropProfile?.cropName || 'Hydroponic'} (${cropProfile?.variety || 'Standard'}) — Stage: ${cropProfile?.growthStage || 'Vegetative'}
 Harvest: Day ${harvestInfo.currentDay}/${harvestInfo.totalCycleDays} — ${harvestInfo.daysToHarvest} days left
 
 Sensor Data:
-- Soil Moisture: ${sensorData.soilMoisture != null ? sensorData.soilMoisture.toFixed(1) : 'N/A'}% (optimal 60–80%)
-- Temperature: ${currentTemp != null ? currentTemp.toFixed(1) : 'N/A'}°C (optimal 24–32°C)
-- Humidity: ${currentHumidity != null ? currentHumidity.toFixed(0) : 'N/A'}% (optimal 70–90%)
+- Soil Moisture: ${sensorData.soilMoisture != null ? sensorData.soilMoisture.toFixed(1) : 'N/A'}% (optimal: ${cropProfile?.useCustomThresholds ? cropProfile.optimalMoisture + '%' : '60–80%'})
+- Temperature: ${displayTemp != null ? displayTemp.toFixed(1) : 'N/A'}°C (optimal: ${cropProfile?.useCustomThresholds ? cropProfile.optimalTemp + '°C' : '24–32°C'})
+- Humidity: ${displayHumidity != null ? displayHumidity.toFixed(0) : 'N/A'}% (optimal: ${cropProfile?.useCustomThresholds ? cropProfile.optimalHumidity + '%' : '70–90%'})
 - UV Index: ${weatherUV != null ? weatherUV.toFixed(1) : 'N/A'}, Wind: ${weatherWind != null ? weatherWind.toFixed(0) : 'N/A'} km/h
 - Health Score: ${healthScore != null ? healthScore.toFixed(0) : 'N/A'}/100
 ${realWeather.description != null ? `Weather: ${realWeather.description}` : ''}
 Active Alerts: ${activeAlerts}
 
-Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action recommendation. Be very concise.`;
+Give 3–5 bullet points using [${prefixHealthy}], [${prefixWarning}], or [${prefixCritical}] prefixes. End with one action recommendation. Be concise.
+IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' : lang === 'ban' ? 'Basa Bali (Balinese)' : 'English'}.`;
 
-      const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-      const result = await model.generateContent(prompt);
+      const result = await executeWithGeminiFallback(
+        { model: 'gemini-2.5-flash' },
+        async (model) => await model.generateContent(prompt)
+      );
       setAiResult(result.response.text());
     } catch (err) {
-      const msg = err.message || '';
-      if (msg.includes('429') || msg.includes('quota')) setAiError('⚠️ Quota exceeded. Try again later.');
-      else if (msg.includes('403') || msg.includes('API key')) setAiError('⚠️ API key error.');
-      else setAiError(`Error: ${msg}`);
+      setAiError(parseGeminiError(err, t));
     } finally {
       setAiLoading(false);
     }
-  };
-
-  /* ── Sensor tiles ────────────────────────────── */
-  const sensors = [
-    {
-      icon: Droplets, label: 'Soil',
-      value: fmt(esp32Connected ? sensorData.soilMoisture : null, '%', 0),
-      unit: '%', rawVal: esp32Connected ? sensorData.soilMoisture : null,
-      ok: esp32Connected && sensorData.soilMoisture >= 60 && sensorData.soilMoisture <= 80,
-      source: 'esp32',
-    },
-    {
-      icon: Leaf, label: 'Health',
-      value: healthScore != null ? `${Math.round(healthScore)}` : null,
-      unit: '/100', rawVal: healthScore,
-      ok: healthScore != null && healthScore >= 75,
-      color: getHealthColor(healthScore),
-      source: 'computed',
-    },
-    {
-      icon: Sun, label: 'UV',
-      value: fmt(weatherUV, '', 1),
-      unit: '', rawVal: weatherUV,
-      ok: weatherUV != null && weatherUV <= 7,
-      source: 'weather',
-    },
-    {
-      icon: Thermometer, label: 'Temp',
-      value: fmt(displayTemp, '', 1),
-      unit: '°C', rawVal: displayTemp,
-      ok: displayTemp != null && displayTemp >= 24 && displayTemp <= 32,
-      source: displayTemp != null ? (esp32Connected && esp32Data.temperature != null ? 'esp32' : 'weather') : 'none',
-    },
-    {
-      icon: Droplets, label: 'Humidity',
-      value: fmt(displayHumidity, '', 0),
-      unit: '%', rawVal: displayHumidity,
-      ok: displayHumidity != null && displayHumidity >= 70 && displayHumidity <= 90,
-      source: displayHumidity != null ? (esp32Connected && esp32Data.humidity != null ? 'esp32' : 'weather') : 'none',
-    },
-    {
-      icon: Wind, label: 'Wind',
-      value: fmt(weatherWind, '', 0),
-      unit: 'km/h', rawVal: weatherWind,
-      ok: weatherWind != null,
-      source: 'weather',
-    },
-  ];
+  }, [aiLoading, lang, alerts, cropProfile, harvestInfo, sensorData, displayTemp, displayHumidity, weatherUV, weatherWind, healthScore, realWeather, t]);
 
   /* ── Render ──────────────────────────────────── */
   return (
@@ -252,33 +234,6 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
         </div>
       )}
 
-      {/* ══════════════ SCAN OVERLAY ══════════════ */}
-      {scanOpen && (
-        <div className="db-scan-overlay">
-          <button className="db-scan-close" onClick={exitScan}><X size={20} /></button>
-          {scanPhase === 'scanning' ? (
-            <div className="db-scan-body">
-              <div className="db-scan-ring-wrap">
-                <div className="db-scan-core"><Bluetooth size={28} /></div>
-                <div className="db-scan-wave" />
-                <div className="db-scan-wave db-scan-wave--2" />
-              </div>
-              <p className="db-scan-title">{t('scanning')}</p>
-              <p className="db-scan-sub">{t('scanning_sub')}</p>
-            </div>
-          ) : (
-            <div className="db-scan-body">
-              <div className="db-scan-ring-wrap db-scan-ring-wrap--fail">
-                <div className="db-scan-core db-scan-core--fail"><Wifi size={28} /></div>
-              </div>
-              <p className="db-scan-title">{t('no_device_found')}</p>
-              <p className="db-scan-sub">{t('no_device_sub')}</p>
-              <button className="db-scan-retry" onClick={retryScan}>{t('retry')}</button>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* ══════════════ HERO ══════════════ */}
       <div className="db-hero">
         <img src={hydroImg} alt="" className="db-hero__bg" />
@@ -288,7 +243,10 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
           {/* Top bar */}
           <div className="db-hero__topbar">
             <div className="db-hero__left">
-              <button className="db-hero__account" onClick={goToAccount}>
+              <button
+                className="db-hero__account"
+                onClick={() => { onNavChange('/account'); navigate('/account'); }}
+              >
                 {user?.avatarUrl
                   ? <img src={user.avatarUrl} alt="account" className="db-hero__account-img" />
                   : <UserCircle size={20} />}
@@ -328,11 +286,11 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
               <span className="db-hero__pill-val">
                 {healthScore != null ? `${Math.round(healthScore)}` : '—'}
               </span>
-              <span className="db-hero__pill-lbl">Health</span>
+              <span className="db-hero__pill-lbl">{t('health')}</span>
             </div>
             <div className="db-hero__pill">
-              <span className="db-hero__pill-val">{isOnline ? 'Online' : 'Offline'}</span>
-              <span className="db-hero__pill-lbl">Status</span>
+              <span className="db-hero__pill-val">{isOnline ? t('connected') : t('offline')}</span>
+              <span className="db-hero__pill-lbl">{t('status_label')}</span>
             </div>
             <div
               className="db-hero__pill db-hero__pill--clickable"
@@ -348,7 +306,7 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
       {/* ══════════════ BODY ══════════════ */}
       <div className="db-body">
 
-        {/* ── Field selector ── */}
+        {/* Field selector */}
         <div className="db-section-hd">
           <span className="db-section-title">{t('your_field')}</span>
           <span className="db-section-tag">{realWeather.description || t('live_data')}</span>
@@ -361,14 +319,14 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
           >
             <img src={hydroImg} alt="" className="db-field-btn__thumb" />
             <div className="db-field-btn__info">
-              <span className="db-field-btn__name">{t('field_name')}</span>
+              <span className="db-field-btn__name">{cropProfile?.cropName || t('field_name')}</span>
               <span className="db-field-btn__desc">{t('field_desc')}</span>
             </div>
             <ChevronDown size={18} className={`db-field-btn__chev ${dropdownOpen ? 'db-field-btn__chev--open' : ''}`} />
           </button>
           {dropdownOpen && (
             <div className="db-field-drop">
-              <button className="db-field-drop__item" onClick={startScan}>
+              <button className="db-field-drop__item" onClick={() => { setDropdownOpen(false); startScan(); }}>
                 <div className="db-field-drop__icon"><Plus size={18} /></div>
                 <div>
                   <span className="db-field-drop__item-name">{t('add_new_device')}</span>
@@ -379,10 +337,10 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
           )}
         </div>
 
-        {/* ── Live sensor card ── */}
+        {/* Live sensor card */}
         <div className="db-sensor-card">
           <div className="db-sensor-card__img-wrap">
-            <img src={hydroImg} alt={t('field_name')} className="db-sensor-card__img" />
+            <img src={hydroImg} alt={cropProfile?.cropName || t('field_name')} className="db-sensor-card__img" />
             <div className="db-sensor-card__live-badge">
               <span className="db-sensor-card__live-dot" />
               <Leaf size={11} />
@@ -390,7 +348,7 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
             </div>
             {!esp32Connected && (
               <div className="db-sensor-card__offline-tag">
-                ESP32 Offline — Soil N/A · Weather active
+                {t('esp32_offline_status')}
               </div>
             )}
           </div>
@@ -403,9 +361,7 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
                   key={s.label}
                   className={`db-sensor ${!hasVal ? 'db-sensor--na' : s.ok ? 'db-sensor--ok' : 'db-sensor--warn'}`}
                 >
-                  <div className="db-sensor__icon-wrap">
-                    <s.icon size={15} strokeWidth={1.8} />
-                  </div>
+                  <s.icon size={15} strokeWidth={1.8} />
                   <div className="db-sensor__vals">
                     {hasVal ? (
                       <span className="db-sensor__val">
@@ -417,16 +373,13 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
                     )}
                   </div>
                   <span className="db-sensor__lbl">{s.label}</span>
-                  {s.source === 'weather' && hasVal && (
-                    <span className="db-sensor__src" title="OpenWeatherMap">🌤</span>
-                  )}
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* ── AI Analysis ── */}
+        {/* AI Analysis */}
         <div
           className={`db-ai ${aiResult || aiLoading ? 'db-ai--active' : ''}`}
           onClick={runAnalysis}
@@ -434,7 +387,7 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
         >
           <div className="db-ai__header">
             <div className="db-ai__icon"><Zap size={16} /></div>
-            <span className="db-ai__label">AI ANALYSIS</span>
+            <span className="db-ai__label">{t('ai_analysis').toUpperCase()}</span>
             {aiLoading
               ? <div className="db-ai__spinner" />
               : <span className="db-ai__hint">{aiResult ? t('re_analyze') : t('tap_to_analyze')}</span>
@@ -442,23 +395,53 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
           </div>
           {aiLoading && <p className="db-ai__status">{t('analyzing')}</p>}
           {!aiLoading && aiResult && (
-            <div className="db-ai__result">
-              {aiResult.split('\n').filter(l => l.trim()).map((line, i) => (
-                <p key={i} className="db-ai__line">
-                  {line.split(/\*\*(.*?)\*\*/).map((p, j) =>
-                    j % 2 === 1 ? <strong key={j}>{p}</strong> : p
-                  )}
-                </p>
-              ))}
+            <div 
+              className="db-ai__result"
+              style={{ animation: `smoothHeight ${aiResult.length * 8 + 200}ms cubic-bezier(0.25, 1, 0.5, 1) forwards` }}
+            >
+              <div className="db-ai__result-inner">
+                {(() => {
+                  let charIndex = 0;
+                  return aiResult.split('\n').filter(l => l.trim()).map((line, li) => {
+                    // Split line by bold markers, then each segment by char
+                    const parts = line.split(/(\*\*.*?\*\*)/);
+                    return (
+                      <p key={li} style={{ fontSize: '12.5px', color: '#333', lineHeight: 1.75, margin: '2px 0' }}>
+                        {parts.map((part, pi) => {
+                          const isBold = part.startsWith('**') && part.endsWith('**');
+                          const text = isBold ? part.slice(2, -2) : part;
+                          const chars = text.split('');
+                          return chars.map((ch, ci) => {
+                            const delay = charIndex++ * 8;
+                            // If it's a space, preserve it with white-space: pre or using a non-breaking space
+                            if (ch === ' ') {
+                              return <span key={`${pi}-${ci}`} className="db-ai__char"> </span>;
+                            }
+                            return (
+                              <span
+                                key={`${pi}-${ci}`}
+                                className="db-ai__char"
+                                style={{ animationDelay: `${delay}ms`, fontWeight: isBold ? 700 : 'inherit' }}
+                              >
+                                {ch}
+                              </span>
+                            );
+                          });
+                        })}
+                      </p>
+                    );
+                  });
+                })()}
+              </div>
             </div>
           )}
-          {!aiLoading && aiError && <p className="db-ai__error">{aiError}</p>}
+          {!aiLoading && aiError  && <p className="db-ai__error">{aiError}</p>}
           {!aiLoading && !aiResult && !aiError && (
             <p className="db-ai__desc">{t('ai_analysis_desc')}</p>
           )}
         </div>
 
-        {/* ── Harvest Progress ── */}
+        {/* Harvest Progress */}
         <div className="db-section-hd" style={{ marginTop: 8 }}>
           <span className="db-section-title">{t('harvest_progress')}</span>
           <span className="db-section-tag">{harvestInfo.daysToHarvest} {t('days_left')}</span>
@@ -475,7 +458,7 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
           </div>
         </div>
 
-        {/* ── Sensor History Chart ── */}
+        {/* Sensor History Chart */}
         <div className="db-section-hd" style={{ marginTop: 8 }}>
           <span className="db-section-title">{t('sensor_history')}</span>
           <div className="db-range-wrap">
@@ -514,11 +497,11 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
                 <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -24, bottom: 0 }}>
                   <defs>
                     <linearGradient id="gradSoil" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0c5e4a" stopOpacity={0.18} />
+                      <stop offset="5%"  stopColor="#0c5e4a" stopOpacity={0.18} />
                       <stop offset="95%" stopColor="#0c5e4a" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="gradUV" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.15} />
+                      <stop offset="5%"  stopColor="#f59e0b" stopOpacity={0.15} />
                       <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                     </linearGradient>
                   </defs>
@@ -528,25 +511,22 @@ Give 3–5 bullet points using 🟢🟡🔴 for status. End with one action reco
                   <YAxis yAxisId="r" orientation="right" axisLine={false} tickLine={false} tick={{ fill: '#bbb', fontSize: 10 }} domain={[0, 12]} />
                   <Tooltip
                     contentStyle={{
-                      background: '#fff',
-                      border: '1px solid #f0f0f0',
-                      borderRadius: 12,
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
-                      fontSize: 12,
+                      background: '#fff', border: '1px solid #f0f0f0',
+                      borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.1)', fontSize: 12,
                     }}
                   />
                   <Area yAxisId="l" type="monotone" dataKey="soil" name="Soil %" stroke="#0c5e4a" strokeWidth={2.2} fill="url(#gradSoil)" dot={false} activeDot={{ r: 5, fill: '#0c5e4a' }} />
-                  <Area yAxisId="r" type="monotone" dataKey="uv" name="UV" stroke="#f59e0b" strokeWidth={2.2} fill="url(#gradUV)" dot={false} activeDot={{ r: 5, fill: '#f59e0b' }} />
+                  <Area yAxisId="r" type="monotone" dataKey="uv"   name="UV"     stroke="#f59e0b" strokeWidth={2.2} fill="url(#gradUV)"  dot={false} activeDot={{ r: 5, fill: '#f59e0b' }} />
                 </AreaChart>
               </ResponsiveContainer>
               <div className="db-chart__legend">
-                <span><span className="db-legend-dot" style={{ background: '#0c5e4a' }} />Soil Moisture</span>
-                <span><span className="db-legend-dot" style={{ background: '#f59e0b' }} />UV Index</span>
+                <span><span className="db-legend-dot" style={{ background: '#0c5e4a' }} />{t('soil')}</span>
+                <span><span className="db-legend-dot" style={{ background: '#f59e0b' }} />{t('uv')}</span>
               </div>
             </>
           ) : (
             <div className="db-chart__empty">
-              <span>📊</span>
+              <Activity size={24} style={{ opacity: 0.4, marginBottom: 8 }} />
               <p>{t('no_data')}</p>
               {chartRange === 'Custom' && <p className="db-chart__empty-hint">{t('select_date_range')}</p>}
             </div>

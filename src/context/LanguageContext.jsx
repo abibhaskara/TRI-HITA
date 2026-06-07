@@ -2,22 +2,31 @@ import { createContext, useContext, useState, useCallback } from 'react';
 
 const LANG_KEY = 'tri-hita_lang';
 
+export const LANGUAGES = [
+  { code: 'en',  label: 'English',          nativeLabel: 'English' },
+  { code: 'id',  label: 'Bahasa Indonesia',  nativeLabel: 'Bahasa Indonesia' },
+  { code: 'ban', label: 'Basa Bali',         nativeLabel: 'Basa Bali' },
+];
+
 const translations = {
   en: {
     // Bottom Nav
     nav_dashboard: 'Dashboard',
-    nav_analysis: 'Analysis',
+    nav_analysis: 'Reports',
     nav_settings: 'Settings',
+    nav_profile: 'Profile',
 
     // Dashboard Hero
-    hi: 'Hi 👋',
+    hi: 'Hi',
     welcome_to: 'Welcome to',
     health: 'Health',
     uptime: 'Uptime',
     connected: 'Online',
+    offline: 'Offline',
     plant_age: 'Plant Age',
     days: 'Days',
     my_fields: 'My Hydroponic',
+    your_field: 'Your Hydroponic',
 
     // Field card
     field_name: 'Hydroponic System',
@@ -35,11 +44,12 @@ const translations = {
     exit: 'Exit',
 
     // AI Analysis (Dashboard)
-    ai_analysis: 'AI Analysis',
-    tap_to_analyze: '✨ Tap to analyze',
+    ai_analysis: 'AI Reports',
+    tap_to_analyze: 'Tap to analyze',
     re_analyze: '↻ Re-analyze',
     analyzing: 'Analyzing...',
     ai_analysis_desc: "Run a live analysis of your plantation's current health, sensor data, and harvest timeline.",
+    esp32_offline_status: 'ESP32 Offline — Soil N/A · Weather active',
 
     // Harvest
     harvest_progress: 'Harvest Progress',
@@ -51,6 +61,8 @@ const translations = {
     sensor_history: 'Sensor History',
     soil: 'Soil',
     uv: 'UV',
+    temp: 'Temp',
+    wind: 'Wind',
     no_data: 'No data',
     select_date_range: 'Select a date range above',
 
@@ -65,6 +77,12 @@ const translations = {
     no_notifications: 'No notifications',
     add_new_device: 'Add New Device',
     unable_to_connect: 'Unable to connect',
+    alert_soil_low: 'Low soil moisture detected',
+    alert_soil_high: 'High soil moisture detected',
+    alert_temp_low: 'Low temperature detected',
+    alert_temp_high: 'High temperature detected',
+    alert_hum_low: 'Low air humidity detected',
+    alert_hum_high: 'High air humidity detected',
 
     // Analysis page
     ai_insights: 'AI Insights',
@@ -82,6 +100,13 @@ const translations = {
     harvest_forecast: 'Harvest Forecast',
     generating_insight: 'Generating insight…',
     smart_insights: 'Smart hydroponic insights',
+    weather_forecast: 'Weather Forecast',
+    detecting_location: 'Detecting location…',
+    weather_label: 'WEATHER',
+    partly_sunny: 'Partly sunny',
+    precipitation_label: 'Precipitation',
+    wind_label: 'Wind',
+    temperature_label: 'Temperature',
 
     // Settings
     settings_title: 'Settings',
@@ -102,6 +127,18 @@ const translations = {
     about_desc: 'Precision AI-powered Hydroponic & Moisture Optimization for Resilient Agriculture',
     irrigating: 'Irrigating...',
     standby: 'Standby',
+    status_label: 'Status',
+    new_alerts: 'new',
+    seconds_short: 'sec',
+
+    // Location (Settings)
+    device_location: 'Device Location (IoT)',
+    lock_location: 'Lock Location',
+    lock_location_desc: 'Lock forecast coordinates to a fixed point',
+    scanning: 'Scanning...',
+    use_current_location: 'Use Current Location',
+    location_error: 'Failed to detect location',
+    geolocation_unsupported: 'Geolocation not supported',
 
     // Account
     account: 'Account Settings',
@@ -120,6 +157,8 @@ const translations = {
     reset_password: 'Reset Password',
     password_reset_initiated: 'Password reset initiated. Please enter your new password.',
     changes_saved: 'Changes Saved',
+    enter_photo_url: 'Enter new photo URL:',
+    enter_your_name: 'Enter your name',
 
     // AI Chatbot
     ask_ai: 'Ask TRI-HITA AI...',
@@ -128,27 +167,65 @@ const translations = {
     data_analysis_engine: 'Data Analysis Engine',
     monitoring_telemetry: 'I am monitoring the live telemetry of your hydroponic system. Ask me to analyze health, water levels, yield projections, or environmental risks.',
     request_telemetry: 'Request telemetry analysis…',
+    prompt_health: 'Analyze the overall plantation health.',
+    prompt_irrigation: 'Are there any irrigation risks today?',
+    prompt_harvest: 'Project harvest readiness.',
 
     // Onboarding
     continue: 'Continue',
     get_started: 'Get Started',
+    tagline: 'Smart Plant Monitoring',
+    no_device_found: 'No devices found',
+    no_device_sub: 'Make sure your device is powered on and in range, then try again.',
+    crop_profile: 'Crop Profile',
+    crop_name: 'Crop Name',
+    variety: 'Variety',
+    growth_stage: 'Growth Stage',
+    cycle_duration: 'Target Cycle (Days)',
+    irrigation_method: 'Irrigation Method',
+    custom_thresholds: 'Custom Thresholds',
+    optimal_moisture: 'Optimal Soil Moisture',
+    optimal_temp: 'Optimal Temp',
+    optimal_humidity: 'Optimal Air Humidity',
+    nursery: 'Nursery',
+    vegetative: 'Vegetative',
+    generative: 'Generative',
+    harvest_stage: 'Harvest',
+    drip_irrigation: 'Drip Irrigation',
+    sprinkler_irrigation: 'Sprinkler Irrigation',
+    manual_irrigation: 'Manual / Rain-dependent',
+    rainfed_irrigation: 'Rainfed',
+    onboarding_title: 'Welcome to TRI-HITA',
+    onboarding_subtitle: 'Setup your crop profile to customize the smart monitoring system.',
+    step: 'Step',
+    use_standard_ai: 'Use AI Defaults',
+    monitoring: 'Monitoring',
+    general_crop: 'General Crop',
+    reset_analysis: 'Reset Analysis',
+    open_ai_analyst: 'Open AI Analyst',
+    quota_exceeded: 'Project quota exhausted. Try again later.',
+    api_key_invalid: 'API key is invalid. Check VITE_GEMINI_API_KEY.',
+    analysis_failed: 'Analysis failed:',
   },
 
   id: {
     // Bottom Nav
     nav_dashboard: 'Beranda',
-    nav_analysis: 'Analisis',
+    nav_analysis: 'Laporan',
     nav_settings: 'Pengaturan',
+    nav_profile: 'Profil',
 
     // Dashboard Hero
-    hi: 'Hai 👋',
+    hi: 'Hai',
     welcome_to: 'Selamat datang di',
     health: 'Kesehatan',
     uptime: 'Waktu Aktif',
     connected: 'Online',
+    offline: 'Offline',
     plant_age: 'Umur Tanaman',
     days: 'Hari',
     my_fields: 'Hidroponik Saya',
+    your_field: 'Hidroponik Anda',
 
     // Field card
     field_name: 'Sistem Hidroponik',
@@ -166,11 +243,12 @@ const translations = {
     exit: 'Keluar',
 
     // AI Analysis (Dashboard)
-    ai_analysis: 'Analisis AI',
-    tap_to_analyze: '✨ Ketuk untuk analisis',
+    ai_analysis: 'Laporan AI',
+    tap_to_analyze: 'Ketuk untuk analisis',
     re_analyze: '↻ Analisis Ulang',
     analyzing: 'Menganalisis...',
     ai_analysis_desc: 'Jalankan analisis langsung kesehatan hidroponik, data sensor, dan jadwal panen Anda.',
+    esp32_offline_status: 'ESP32 Offline — Kelembapan Tanah N/A · Cuaca aktif',
 
     // Harvest
     harvest_progress: 'Progres Panen',
@@ -182,6 +260,8 @@ const translations = {
     sensor_history: 'Riwayat Sensor',
     soil: 'Tanah',
     uv: 'UV',
+    temp: 'Suhu',
+    wind: 'Angin',
     no_data: 'Tidak ada data',
     select_date_range: 'Pilih rentang tanggal di atas',
 
@@ -196,6 +276,12 @@ const translations = {
     no_notifications: 'Tidak ada notifikasi',
     add_new_device: 'Tambah Perangkat Baru',
     unable_to_connect: 'Tidak dapat terhubung',
+    alert_soil_low: 'Kelembapan tanah rendah terdeteksi',
+    alert_soil_high: 'Kelembapan tanah tinggi terdeteksi',
+    alert_temp_low: 'Suhu rendah terdeteksi',
+    alert_temp_high: 'Suhu tinggi terdeteksi',
+    alert_hum_low: 'Kelembapan udara rendah terdeteksi',
+    alert_hum_high: 'Kelembapan udara tinggi terdeteksi',
 
     // Analysis page
     ai_insights: 'Wawasan AI',
@@ -213,6 +299,13 @@ const translations = {
     harvest_forecast: 'Prakiraan Panen',
     generating_insight: 'Membuat wawasan…',
     smart_insights: 'Wawasan hidroponik cerdas',
+    weather_forecast: 'Prakiraan Cuaca',
+    detecting_location: 'Mendeteksi lokasi…',
+    weather_label: 'CUACA',
+    partly_sunny: 'Cerah berawan',
+    precipitation_label: 'Presipitasi',
+    wind_label: 'Angin',
+    temperature_label: 'Suhu',
 
     // Settings
     settings_title: 'Pengaturan',
@@ -233,6 +326,18 @@ const translations = {
     about_desc: 'Optimalisasi Hidroponik & Kelembaban Berbasis AI untuk Pertanian Tangguh',
     irrigating: 'Menyiram...',
     standby: 'Siaga',
+    status_label: 'Status',
+    new_alerts: 'baru',
+    seconds_short: 'dtk',
+
+    // Location (Settings)
+    device_location: 'Lokasi Alat (IoT)',
+    lock_location: 'Kunci Lokasi',
+    lock_location_desc: 'Kunci koordinat ramalan cuaca di satu titik',
+    scanning: 'Memindai...',
+    use_current_location: 'Gunakan Lokasi Saat Ini',
+    location_error: 'Gagal mendeteksi lokasi',
+    geolocation_unsupported: 'Geolokasi tidak didukung',
 
     // Account
     account: 'Pengaturan Akun',
@@ -251,6 +356,8 @@ const translations = {
     reset_password: 'Atur Ulang Sandi',
     password_reset_initiated: 'Penyetelan ulang sandi dimulai. Silakan masukkan sandi baru Anda.',
     changes_saved: 'Perubahan Disimpan',
+    enter_photo_url: 'Masukkan URL foto baru:',
+    enter_your_name: 'Masukkan nama Anda',
 
     // AI Chatbot
     ask_ai: 'Tanya TRI-HITA AI...',
@@ -259,10 +366,244 @@ const translations = {
     data_analysis_engine: 'Mesin Analisis Data',
     monitoring_telemetry: 'Saya memantau telemetri langsung sistem hidroponik Anda. Tanyakan tentang kesehatan, kadar air, proyeksi hasil, atau risiko lingkungan.',
     request_telemetry: 'Minta analisis telemetri…',
+    prompt_health: 'Analisis kesehatan perkebunan secara keseluruhan.',
+    prompt_irrigation: 'Apakah ada risiko irigasi hari ini?',
+    prompt_harvest: 'Proyeksi kesiapan panen.',
 
     // Onboarding
     continue: 'Lanjutkan',
     get_started: 'Mulai',
+    tagline: 'Pemantauan Tanaman Cerdas',
+    no_device_found: 'Perangkat tidak ditemukan',
+    no_device_sub: 'Pastikan perangkat menyala dan dalam jangkauan, lalu coba lagi.',
+    crop_profile: 'Profil Tanaman',
+    crop_name: 'Nama Tanaman',
+    variety: 'Varietas',
+    growth_stage: 'Tahap Pertumbuhan',
+    cycle_duration: 'Target Siklus (Hari)',
+    irrigation_method: 'Metode Irigasi',
+    custom_thresholds: 'Batasan Kustom',
+    optimal_moisture: 'Kelembaban Tanah Optimal',
+    optimal_temp: 'Suhu Optimal',
+    optimal_humidity: 'Kelembaban Udara Optimal',
+    nursery: 'Pembibitan',
+    vegetative: 'Vegetatif',
+    generative: 'Generatif',
+    harvest_stage: 'Masa Panen',
+    drip_irrigation: 'Irigasi Tetes',
+    sprinkler_irrigation: 'Curah/Sprinkler',
+    manual_irrigation: 'Manual / Tergantung Hujan',
+    rainfed_irrigation: 'Tadah Hujan',
+    onboarding_title: 'Selamat Datang di TRI-HITA',
+    onboarding_subtitle: 'Atur profil tanaman Anda untuk menyesuaikan sistem pemantauan cerdas.',
+    step: 'Langkah',
+    use_standard_ai: 'Gunakan Standar AI',
+    monitoring: 'Memantau',
+    general_crop: 'Tanaman Umum',
+    reset_analysis: 'Reset Analisis',
+    open_ai_analyst: 'Buka Analis AI',
+    quota_exceeded: 'Kuota proyek habis. Silakan coba lagi nanti.',
+    api_key_invalid: 'Kunci API tidak valid. Periksa VITE_GEMINI_API_KEY.',
+    analysis_failed: 'Analisis gagal:',
+  },
+
+  ban: {
+    // Bottom Nav
+    nav_dashboard: 'Umah',
+    nav_analysis: 'Laporan',
+    nav_settings: 'Setelan',
+    nav_profile: 'Profil',
+
+    // Dashboard Hero
+    hi: 'Om Swastyastu',
+    welcome_to: 'Rahajeng rauh ring',
+    health: 'Kasehatan',
+    uptime: 'Wawu Aktif',
+    connected: 'Nyambung',
+    offline: 'Medal',
+    plant_age: 'Umur Taneman',
+    days: 'Rahina',
+    my_fields: 'Hidroponik Tiange',
+    your_field: 'Hidroponik Palungguh',
+
+    // Field card
+    field_name: 'Sistem Hidroponik',
+    field_desc: 'Pantau patumbuhan, penyiraman, lan siklus panen.',
+    live: 'Langsung',
+    live_data: 'Data Langsung',
+    tap_to_scan: 'Sentuh mangda mapindai alat sane sampun wenten',
+
+    // Device scan modal
+    scanning_title: 'Ngrereh alat…',
+    scanning_sub: 'Pastiang alat sane wenten sampun nyalain lan sada rauh.',
+    scan_failed_title: 'Alat nenten kapanggihin',
+    scan_failed_sub: 'Pastiang alat nyalain lan wenten ring jangkauan, raris cobian malih.',
+    retry: 'Cobian Malih',
+    exit: 'Medal',
+
+    // AI Analysis (Dashboard)
+    ai_analysis: 'Laporan AI',
+    tap_to_analyze: 'Sentuh mangda nganalisis',
+    re_analyze: '↻ Analisis Malih',
+    analyzing: 'Kantun nganalisis...',
+    ai_analysis_desc: 'Laksanayang analisis langsung kasehatan hidroponik, data sensor, lan jadwal panen Palungguh.',
+    esp32_offline_status: 'ESP32 Medal — Tanah N/A · Cuaca aktif',
+
+    // Harvest
+    harvest_progress: 'Progres Panen',
+    days_left: 'rahina malih',
+    day: 'Rahina',
+    of: 'saking',
+
+    // Chart
+    sensor_history: 'Riwayat Sensor',
+    soil: 'Tanah',
+    uv: 'UV',
+    temp: 'Suhu',
+    wind: 'Angin',
+    no_data: 'Nenten wenten data',
+    select_date_range: 'Pilih rentang tanggal ring ajeng',
+
+    // Power
+    power_system: 'Sistem Daya',
+    charging: 'Ngisi',
+    battery: 'Baterai',
+    solar: 'Surya',
+
+    // Notifications
+    notifications: 'Pawartaan',
+    no_notifications: 'Nenten wenten pawartaan',
+    add_new_device: 'Tambah Alat Anyar',
+    unable_to_connect: 'Nenten prasida nyambung',
+    alert_soil_low: 'Kelembaban tanah bawak kapanggihin',
+    alert_soil_high: 'Kelembaban tanah tegeh kapanggihin',
+    alert_temp_low: 'Suhu bawak kapanggihin',
+    alert_temp_high: 'Suhu tegeh kapanggihin',
+    alert_hum_low: 'Kelembaban udara bawak kapanggihin',
+    alert_hum_high: 'Kelembaban udara tegeh kapanggihin',
+
+    // Analysis page
+    ai_insights: 'Wicara AI',
+    zone_overview: 'Gambaran Zona',
+    zones: 'zona',
+    area: 'Genah',
+    trees: 'Wit',
+    healthy: 'Seger',
+    warning: 'Paweling',
+    critical: 'Kritis',
+    humidity: 'Kelembaban',
+    canopy_coverage: 'Penutup Kanopi Optimal',
+    soil_moisture_alert: 'Paweling Kelembaban Tanah',
+    pest_activity: 'Aktivitas Hama Kaaptiang',
+    harvest_forecast: 'Ramalan Panen',
+    generating_insight: 'Ngrancang wicara…',
+    smart_insights: 'Wicara hidroponik sane lantip',
+    weather_forecast: 'Ramalan Cuaca',
+    detecting_location: 'Ngrereh genah…',
+    weather_label: 'CUACA',
+    partly_sunny: 'Sada galang',
+    precipitation_label: 'Presipitasi',
+    wind_label: 'Angin',
+    temperature_label: 'Suhu',
+
+    // Settings
+    settings_title: 'Setelan',
+    system_config: 'Konfigurasi Sistem',
+    sprinkler_control: 'Kontrol Sprinkler',
+    auto_irrigation: 'Irigasi Otomatis',
+    auto_irrigation_desc: 'Aktivasi sprinkler otomatis berbasis AI',
+    push_notifications: 'Pawartaan Push',
+    receive_alerts: 'Tampi paweling lan pembaruan',
+    alert_history: 'Riwayat Paweling',
+    alerts: 'paweling',
+    system: 'Sistem',
+    refresh_interval: 'Interval Pembaruan',
+    language: 'Basa',
+    network_status: 'Status Jaringan',
+    firmware: 'Firmware',
+    reset: 'Reset',
+    about_desc: 'Optimalisasi Hidroponik & Kelembaban Berbasis AI kangge Pertanian sane Tangguh ring Bali',
+    irrigating: 'Nguberin...',
+    standby: 'Siaga',
+    status_label: 'Status',
+    new_alerts: 'anyar',
+    seconds_short: 'dtk',
+
+    // Location (Settings)
+    device_location: 'Genah Alat (IoT)',
+    lock_location: 'Kunci Genah',
+    lock_location_desc: 'Kunci koordinat ramalan cuaca ring satu titik',
+    scanning: 'Kantun mapindai...',
+    use_current_location: 'Anggen Genah Sane Mangkin',
+    location_error: 'Nenten prasida ngaptiang genah',
+    geolocation_unsupported: 'Geolokasi nenten kaadukung',
+
+    // Account
+    account: 'Setelan Akun',
+    personal_info: 'Informasi Pribadi',
+    full_name: 'Adan Lengkap',
+    email: 'Alamat Email',
+    plantation_setup: 'Setelan Pekarangan',
+    plant_type: 'Soroh Taneman',
+    planted_date: 'Tanggal Nandur',
+    save_changes: 'Simpen Owahan',
+    saved: '✓ Kasimpen',
+    your_avatar: 'Avatar Palungguh',
+    plant_photo: 'Foto Taneman',
+    change: 'Ganti',
+    password: 'Sandi',
+    reset_password: 'Atur Ulang Sandi',
+    password_reset_initiated: 'Pengaturan ulang sandi sampun kamulan. Tulungin lebokang sandi anyar Palungguh.',
+    changes_saved: 'Owahan Kasimpen',
+    enter_photo_url: 'Lebokang URL foto anyar:',
+    enter_your_name: 'Lebokang adan Palungguh',
+
+    // AI Chatbot
+    ask_ai: 'Takonang ring TRI-HITA AI...',
+    ai_greeting: 'Om Swastyastu! Tiang TRI-HITA AI. Sapunapi tiang prasida ngwantu ngoptimalang sistem hidroponik Palungguh rahina mangkin?',
+    type_message: 'Ketik pawos...',
+    data_analysis_engine: 'Mesin Analisis Data',
+    monitoring_telemetry: 'Tiang mantau telemetri langsung sistem hidroponik Palungguh. Takonang indik kasehatan, kadar yeh, proyeksi hasil, utawi risiko lingkungan.',
+    request_telemetry: 'Ngajap analisis telemetri…',
+    prompt_health: 'Analisis kasehatan pekarangan makasami.',
+    prompt_irrigation: 'Wenten risikoning nguberin yeh rahina mangkin?',
+    prompt_harvest: 'Proyeksi kasayagan panen.',
+
+    // Onboarding
+    continue: 'Nglanjutin',
+    get_started: 'Miwit',
+    tagline: 'Pemantauan Taneman Lantip',
+    no_device_found: 'Alat nenten kapanggihin',
+    no_device_sub: 'Pastiang alat nyalain lan wenten ring jangkauan, raris cobian malih.',
+    crop_profile: 'Profil Taneman',
+    crop_name: 'Adan Taneman',
+    variety: 'Varietas',
+    growth_stage: 'Tahap Patumbuhan',
+    cycle_duration: 'Target Siklus (Rahina)',
+    irrigation_method: 'Metode Nguberin Yeh',
+    custom_thresholds: 'Batasan Kustom',
+    optimal_moisture: 'Kelembaban Tanah Optimal',
+    optimal_temp: 'Suhu Optimal',
+    optimal_humidity: 'Kelembaban Udara Optimal',
+    nursery: 'Nursery/Pembibitan',
+    vegetative: 'Vegetatif',
+    generative: 'Generatif',
+    harvest_stage: 'Masa Panen',
+    drip_irrigation: 'Irigasi Tetes',
+    sprinkler_irrigation: 'Curah/Sprinkler',
+    manual_irrigation: 'Manual / Saking Ujan',
+    rainfed_irrigation: 'Tadah Ujan',
+    onboarding_title: 'Rahajeng Rauh ring TRI-HITA',
+    onboarding_subtitle: 'Setel profil taneman Palungguh kangge nyesuaiang pemantauan lantip.',
+    step: 'Langkah',
+    use_standard_ai: 'Anggen Standar AI',
+    monitoring: 'Nureksain',
+    general_crop: 'Tanduran Umum',
+    reset_analysis: 'Reset Analisis',
+    open_ai_analyst: 'Buka Analis AI',
+    quota_exceeded: 'Kuota proyek telas. Durus coba malih jebos.',
+    api_key_invalid: 'Kunci API nenten patut. Riksa VITE_GEMINI_API_KEY.',
+    analysis_failed: 'Analisis nenten memargi becik:',
   },
 };
 
@@ -272,7 +613,8 @@ const LanguageContext = createContext(null);
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState(() => {
     try {
-      return localStorage.getItem(LANG_KEY) || 'en';
+      const stored = localStorage.getItem(LANG_KEY);
+      return LANGUAGES.some(l => l.code === stored) ? stored : 'en';
     } catch {
       return 'en';
     }
