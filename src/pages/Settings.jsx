@@ -24,7 +24,7 @@ export default function Settings() {
     const [locError,   setLocError]   = useState(null);
     const [locLoading, setLocLoading] = useState(false);
 
-    // Consolidated coordinate change handler
+    
     const handleCoordChange = useCallback((field, min, max, setValue) => (e) => {
         const val = e.target.value;
         setValue(val);
@@ -55,7 +55,7 @@ export default function Settings() {
     return (
         <div className="page settings">
 
-            {/* Dark green hero header */}
+            
             <div className="page-hero animate-in">
                 <div className="page-hero__top">
                     <div>
@@ -69,10 +69,10 @@ export default function Settings() {
                 </div>
             </div>
 
-            {/* White body */}
+            
             <div className="page-body">
 
-                {/* Auto Irrigation */}
+                
                 <div className="section animate-in animate-delay-2">
                     <div className="glass-card settings__option">
                         <div className="settings__option-info">
@@ -89,7 +89,7 @@ export default function Settings() {
                     </div>
                 </div>
 
-                {/* Notifications */}
+                
                 <div className="section animate-in animate-delay-4">
                     <div className="section-header">
                         <span className="section-title">
@@ -151,7 +151,7 @@ export default function Settings() {
                     )}
                 </div>
 
-                {/* System Config */}
+                
                 <div className="section animate-in">
                     <div className="section-header">
                         <span className="section-title">{t('system')}</span>
@@ -198,7 +198,7 @@ export default function Settings() {
                     </div>
                 </div>
 
-                {/* Device Location */}
+                
                 <div className="section animate-in">
                     <div className="section-header">
                         <span className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -263,7 +263,7 @@ export default function Settings() {
                     </div>
                 </div>
 
-                {/* Account */}
+                
                 <div className="section animate-in">
                     <div className="glass-card settings__account-card">
                         <div className="settings__account-avatar">
@@ -283,7 +283,7 @@ export default function Settings() {
                     </div>
                 </div>
 
-                {/* About */}
+                
                 <div className="section animate-in">
                     <div className="glass-card settings__about">
                         <Info size={16} strokeWidth={1.5} className="settings__about-icon" />
@@ -294,7 +294,7 @@ export default function Settings() {
                         </div>
                     </div>
                 </div>
-            </div>{/* /page-body */}
+            </div>
         </div>
     );
 }

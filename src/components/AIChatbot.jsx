@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { Bot, X, Send, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useData } from '../context/DataContext';
 import { useUser } from '../context/UserContext';
 import { useLang } from '../context/LanguageContext';
@@ -96,7 +95,7 @@ export default function AIChatbot() {
     const inputRef       = useRef(null);
     const panelRef       = useRef(null);
 
-    // iOS Visual Viewport Keyboard Fix
+    
     useEffect(() => {
         if (!window.visualViewport) return;
 
@@ -135,12 +134,12 @@ export default function AIChatbot() {
         };
     }, [isOpen, isFullscreen]);
 
-    // Scroll to bottom on new messages
+    
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isLoading]);
 
-    // Focus input when panel opens
+    
     useEffect(() => {
         if (isOpen) setTimeout(() => inputRef.current?.focus(), 300);
     }, [isOpen]);

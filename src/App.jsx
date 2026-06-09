@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, createContext, useContext, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { AnimatePresence, motion } from 'framer-motion'; 
 import { DataProvider, useData } from './context/DataContext';
 import { UserProvider } from './context/UserContext';
 import { LanguageProvider, useLang } from './context/LanguageContext';
@@ -18,13 +18,13 @@ import { useUser } from './context/UserContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
 
-/* ── Route order — determines slide direction ───────────────── */
+
 const ROUTE_ORDER = ['/account', '/', '/analysis', '/settings'];
 
 export const NavDirectionContext = createContext({ direction: 0 });
 export function useNavDirection() { return useContext(NavDirectionContext); }
 
-/* ── Animated page wrapper ──────────────────────────────────── */
+
 const variants = {
   enter: (dir) => ({
     x: dir >= 0 ? '100%' : '-100%',
@@ -47,7 +47,7 @@ function AnimatedRoutes({ direction }) {
   const location = useLocation();
 
   return (
-    <AnimatePresence custom={direction} mode="popLayout">
+    <AnimatePresence initial={false} custom={direction} mode="popLayout">
       <motion.div
         key={location.pathname}
         custom={direction}
@@ -68,7 +68,7 @@ function AnimatedRoutes({ direction }) {
   );
 }
 
-/** Inner shell — reads user from context */
+
 function AppShell() {
   const { user } = useUser();
   const [direction, setDirection] = useState(0);
@@ -77,7 +77,7 @@ function AppShell() {
   const { scanOpen, scanPhase, exitScan, retryScan } = useData();
   const { t } = useLang();
 
-  // Track location changes to automatically compute slide transition direction
+  
   useEffect(() => {
     const toPath = location.pathname;
     const toIndex = ROUTE_ORDER.indexOf(toPath);
@@ -89,7 +89,7 @@ function AppShell() {
     }
   }, [location.pathname]);
 
-  /* Called by LivingNavbar before navigating to compute direction */
+  
   const handleNavChange = useCallback((toPath) => {
     const toIndex = ROUTE_ORDER.indexOf(toPath);
     const fromIndex = prevIndexRef.current;
@@ -147,14 +147,6 @@ function AppShell() {
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
 
-  if (showSplash) {
-    return (
-      <LanguageProvider>
-        <SplashScreen onDone={() => setShowSplash(false)} />
-      </LanguageProvider>
-    );
-  }
-
   return (
     <ErrorBoundary>
       <BrowserRouter>
@@ -162,6 +154,7 @@ export default function App() {
           <LanguageProvider>
             <DataProvider>
               <AppShell />
+              {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
             </DataProvider>
           </LanguageProvider>
         </UserProvider>

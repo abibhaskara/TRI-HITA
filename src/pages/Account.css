@@ -1,15 +1,13 @@
-/* ================================================================
-   Account Page — Premium Modern Profile (Synced with TRI-HITA Design System)
-   ================================================================ */
+
 
 .account-page {
-    background: #f0f2ee; /* matches dashboard root background */
+    background: #f0f2ee; 
     min-height: 100vh;
-    padding-bottom: 110px; /* room for bottom nav */
+    padding-bottom: 110px; 
     font-family: var(--font-body, 'Inter', sans-serif);
 }
 
-/* ── Hero header integration ── */
+
 .account-page .page-hero {
     background: var(--bg-header);
     padding: calc(52px + env(safe-area-inset-top)) 20px 24px;
@@ -100,7 +98,7 @@
     transform: scale(0.95);
 }
 
-/* ── Content container ── */
+
 .account-content {
     padding: var(--space-xl) var(--space-lg);
     max-width: 500px;
@@ -109,7 +107,7 @@
     z-index: 2;
 }
 
-/* ── Profile Section ── */
+
 .profile-section {
     display: flex;
     flex-direction: column;
@@ -174,7 +172,7 @@
     margin: 0;
 }
 
-/* ── Settings Group ── */
+
 .settings-group {
     background: var(--bg-primary);
     border-radius: var(--radius-lg);
@@ -227,7 +225,7 @@
     background: var(--bg-primary);
 }
 
-/* ── Password input with reset button ── */
+
 .password-input-wrap {
     display: flex;
     gap: var(--space-sm);
@@ -272,7 +270,7 @@
     to { transform: rotate(360deg); }
 }
 
-/* ── Save Button ── */
+
 .save-btn {
     width: 100%;
     padding: var(--space-lg);
@@ -310,7 +308,7 @@
     cursor: not-allowed;
 }
 
-/* Loader inner simulation */
+
 .loader-inner {
     width: 20px;
     height: 20px;
@@ -320,7 +318,7 @@
     animation: spin 0.8s linear infinite;
 }
 
-/* ── Animations ── */
+
 .animate-in {
     animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

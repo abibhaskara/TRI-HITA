@@ -1,11 +1,6 @@
-/**
- * cropUtils.js
- * Pure helper functions for crop threshold logic, health scoring,
- * WMO weather mapping, and relative time formatting.
- * Extracted from DataContext to keep the context lean and enable reuse.
- */
 
-// ── Crop defaults ──────────────────────────────────────────────────────────
+
+
 export const CROP_DEFAULTS = {
   lettuce:      { minSoil: 65, maxSoil: 85, minTemp: 18, maxTemp: 26, minHum: 60, maxHum: 80 },
   pakcoy:       { minSoil: 70, maxSoil: 90, minTemp: 20, maxTemp: 28, minHum: 65, maxHum: 85 },
@@ -15,7 +10,7 @@ export const CROP_DEFAULTS = {
   custom:       { minSoil: 60, maxSoil: 80, minTemp: 24, maxTemp: 32, minHum: 70, maxHum: 90 },
 };
 
-/** Derive thresholds from a crop profile (custom or named). */
+
 export function getCropThresholds(cropProfile) {
   if (cropProfile?.useCustomThresholds) {
     const { optimalMoisture, optimalTemp, optimalHumidity } = cropProfile;
@@ -38,12 +33,9 @@ export function getCropThresholds(cropProfile) {
   return CROP_DEFAULTS.custom;
 }
 
-// ── Health scoring ─────────────────────────────────────────────────────────
 
-/**
- * Compute plant health score (0–100) from sensor readings.
- * Weights: soil 35%, humidity 25%, temperature 25%, light 15%.
- */
+
+
 export function computeHealthScore({ soilMoisture, humidity, temperature, lightLevel, thresholds }) {
   const { minSoil = 60, maxSoil = 80, minTemp = 24, maxTemp = 32, minHum = 70, maxHum = 90 } =
     thresholds || {};
@@ -70,9 +62,9 @@ export function computeHealthScore({ soilMoisture, humidity, temperature, lightL
   return totalWeight === 0 ? null : parseFloat((totalScore / totalWeight).toFixed(0));
 }
 
-// ── WMO weather codes ──────────────────────────────────────────────────────
 
-/** WMO weather code → { desc, emoji } */
+
+
 export function getWmoInfo(code) {
   if (code === 0)    return { desc: 'Clear Sky',     emoji: '☀️' };
   if (code <= 2)     return { desc: 'Partly Cloudy', emoji: '⛅' };
@@ -86,14 +78,14 @@ export function getWmoInfo(code) {
   return                    { desc: 'Thunderstorm',   emoji: '⛈️' };
 }
 
-/** WMO code + isDay → 'sunny' | 'rainy' | 'night' */
+
 export function mapWmoToTheme(code, isDay) {
   if (code >= 51) return 'rainy';
   if (!isDay)     return 'night';
   return 'sunny';
 }
 
-/** Convert OpenWeatherMap codes to approximate WMO equivalents. */
+
 export function convertOwmToWmo(code) {
   if (code >= 200 && code < 300) return 95;
   if (code >= 300 && code < 400) return 51;
@@ -106,9 +98,9 @@ export function convertOwmToWmo(code) {
   return 0;
 }
 
-// ── Relative time ──────────────────────────────────────────────────────────
 
-/** Format a timestamp as a relative time string in the given language. */
+
+
 export function formatRelativeTime(timestamp, lang) {
   if (!timestamp) return '';
   const mins = Math.floor((Date.now() - timestamp) / 60_000);

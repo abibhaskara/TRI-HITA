@@ -1,15 +1,13 @@
-/* ================================================================
-   Analysis Page — Smart Garden AI style
-   ================================================================ */
+
 
 .analysis {
     background: #f3f4f0;
     font-family: var(--font-body, 'Inter', sans-serif);
     padding: 0;
-    padding-bottom: 100px; /* room for bottom nav */
+    padding-bottom: 100px; 
 }
 
-/* ── Hero header ────────────────────────────────────────────────── */
+
 .page-hero {
     background: var(--bg-header);
     padding: calc(52px + env(safe-area-inset-top)) 20px 24px;
@@ -76,7 +74,7 @@
     backdrop-filter: blur(8px);
 }
 
-/* ── White body ─────────────────────────────────────────────────── */
+
 .page-body {
     background: #f3f4f0;
     border-radius: 28px 28px 0 0;
@@ -85,7 +83,7 @@
     z-index: 2;
 }
 
-/* ── Section headers ────────────────────────────────────────────── */
+
 .pg-section-header {
     display: flex;
     align-items: center;
@@ -107,7 +105,7 @@
     color: var(--text-accent);
 }
 
-/* ── White card ─────────────────────────────────────────────────── */
+
 .pg-card {
     background: #fff;
     border-radius: 18px;
@@ -116,7 +114,7 @@
     box-shadow: 0 1px 8px rgba(0,0,0,0.06);
 }
 
-/* ── Analysis brain badge ───────────────────────────────────────── */
+
 .analysis__brain-badge {
     width: 44px;
     height: 44px;
@@ -129,7 +127,7 @@
     color: #fff;
 }
 
-/* ── Stat pills row (in hero) ───────────────────────────────────── */
+
 .page-hero__pills {
     display: flex;
     gap: 10px;
@@ -163,7 +161,7 @@
     color: #fff;
 }
 
-/* ── AI Insights ────────────────────────────────────────────────── */
+
 .analysis__insights {
     display: flex;
     flex-direction: column;
@@ -178,7 +176,7 @@
     cursor: pointer;
     outline: none;
     -webkit-tap-highlight-color: transparent;
-    /* Smooth morphing — no bounce */
+    
     transition:
         border-radius  380ms var(--ease-out-expo, cubic-bezier(0.19,1,0.22,1)),
         padding        340ms var(--ease-out-expo, cubic-bezier(0.19,1,0.22,1)),
@@ -231,7 +229,7 @@
     line-height: 1.8;
     word-break: break-word;
     display: grid;
-    /* animation set dynamically in JSX to sync with text length */
+    
 }
 
 .analysis__insight-desc-inner {
@@ -245,7 +243,7 @@
     to   { grid-template-rows: 1fr; opacity: 1; transform: translateY(0); }
 }
 
-/* Per-character reveal — no bounce */
+
 @keyframes insightCharReveal {
     from { opacity: 0; transform: translateY(3px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -256,7 +254,7 @@
     opacity: 0;
     white-space: pre-wrap;
     animation: insightCharReveal 200ms var(--ease-out-expo, cubic-bezier(0.19,1,0.22,1)) forwards;
-    /* animationDelay set per-char via inline style */
+    
 }
 
 .analysis__insight-loading {
@@ -274,7 +272,7 @@
     to { transform: rotate(360deg); }
 }
 
-/* ── Zone grid ──────────────────────────────────────────────────── */
+
 .analysis__zone-grid {
     display: flex;
     flex-direction: column;
@@ -349,7 +347,7 @@
     transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── Forecast Widget ── */
+
 .forecast-loc {
     display: flex;
     align-items: center;
@@ -430,7 +428,7 @@
     font-weight: 600;
 }
 
-/* 3-column sub-stats grid */
+
 .forecast-stats-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -465,7 +463,7 @@
     letter-spacing: 0.3px;
 }
 
-/* Forecast Tabs */
+
 .forecast-tabs {
     display: flex;
     gap: 4px;
@@ -494,7 +492,7 @@
     box-shadow: 0 4px 12px rgba(12, 94, 74, 0.2);
 }
 
-/* Chart container */
+
 .forecast-chart-wrap {
     margin-bottom: 16px;
     background: rgba(255, 255, 255, 0.5);
@@ -503,7 +501,7 @@
     padding: 10px 4px 6px;
 }
 
-/* Daily weekly forecast list */
+
 .forecast-daily-list {
     display: flex;
     gap: 8px;

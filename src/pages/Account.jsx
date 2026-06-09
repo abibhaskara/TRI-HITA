@@ -17,9 +17,9 @@ export default function Account() {
   const [plantPhotoUrl, _setPlantPhotoUrl] = useState(user?.plantPhotoUrl || '');
   const [password, setPassword] = useState(user?.password || '••••••••');
   const [isResetting, setIsResetting] = useState(false);
-  const [saveStatus, setSaveStatus] = useState(null); // 'saving' | 'saved'
+  const [saveStatus, setSaveStatus] = useState(null); 
 
-  // Crop states
+  
   const [cropName, setCropName] = useState(cropProfile?.cropName || '');
   const [varietyLabel, setVarietyLabel] = useState(cropProfile?.variety || '');
   const [growthStage, setGrowthStage] = useState(cropProfile?.growthStage || 'vegetative');
@@ -35,7 +35,7 @@ export default function Account() {
     if (saveStatus === 'saving') return;
     setSaveStatus('saving');
     
-    // Simulate API delay
+    
     setTimeout(() => {
       updateUser({ 
         name, 
@@ -72,7 +72,7 @@ export default function Account() {
 
   return (
     <div className="page account-page">
-      {/* Dark green hero header */}
+      
       <div className="page-hero animate-in">
         <div className="page-hero__top">
           <button className="back-btn" onClick={() => navigate('/')} aria-label="Go back">

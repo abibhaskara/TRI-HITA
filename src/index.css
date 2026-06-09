@@ -1,16 +1,11 @@
-/* ===== TRI-HITA Design System — Golden Ratio Scale (φ = 1.618) ===== */
-/*
- * All proportions follow the golden ratio progression.
- * Base unit: 4px
- * Scale: 4 → 6 → 10 → 16 → 26 → 42 → 68
- * Font scale: 0.64rem → 0.75rem → 0.875rem → 1rem → 1.618rem → 2.618rem
- */
+
+
 
 :root {
-  /* Golden Ratio Constants */
+  
   --phi: 1.618;
 
-  /* Primary Colors - Vibrant Green & Emerald Teal (Extracted from Tri-Hita Poster) */
+  
   --primary-900: #05241c;
   --primary-800: #053b2e;
   --primary-700: #084e3e;
@@ -22,7 +17,7 @@
   --primary-100: #a3fae6;
   --primary-50: #ecfcf8;
 
-  /* Accent Colors */
+  
   --accent-green: #117058;
   --accent-green-dark: #053b2e;
   --accent-green-light: #2ad1ab;
@@ -33,14 +28,14 @@
   --accent-coral: #dc6b6b;
   --accent-teal: #117058;
 
-  /* Background */
+  
   --bg-primary: #ffffff;
   --bg-secondary: #f4faf8;
   --bg-tertiary: #e9f5f0;
   --bg-header: linear-gradient(160deg, #053b2e 0%, #0c5e4a 50%, #208b73 100%);
   --bg-header-soft: linear-gradient(160deg, #053b2e 0%, #208b73 100%);
 
-  /* Surface Colors */
+  
   --surface-card: rgba(255, 255, 255, 0.7);
   --surface-card-hover: rgba(255, 255, 255, 0.82);
   --surface-elevated: rgba(255, 255, 255, 0.9);
@@ -48,20 +43,20 @@
   --surface-input: rgba(255, 255, 255, 0.55);
   --surface-overlay: rgba(0, 0, 0, 0.35);
 
-  /* Text Colors */
+  
   --text-primary: #021a14;
   --text-secondary: #2f4a43;
   --text-tertiary: #7d9690;
   --text-on-dark: #ffffff;
   --text-accent: #0c5e4a;
 
-  /* Borders — thin & subtle */
+  
   --border-subtle: rgba(12, 94, 74, 0.05);
   --border-light: rgba(12, 94, 74, 0.1);
   --border-input: rgba(12, 94, 74, 0.15);
   --border-accent: rgba(12, 94, 74, 0.28);
 
-  /* Shadows — minimal, clean */
+  
   --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.03);
   --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
@@ -70,14 +65,8 @@
   --shadow-btn: 0 4px 12px rgba(12, 94, 74, 0.25);
   --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.03);
 
-  /* ===== SPACING — Golden Ratio from 4px ===== */
-  /*  4 × 1.618 = 6.5 ≈ 6
-   *  6 × 1.618 = 9.7 ≈ 10
-   * 10 × 1.618 = 16.2 ≈ 16
-   * 16 × 1.618 = 25.9 ≈ 26
-   * 26 × 1.618 = 42.1 ≈ 42
-   * 42 × 1.618 = 67.9 ≈ 68
-   */
+  
+  
   --space-xs: 4px;
   --space-sm: 6px;
   --space-md: 10px;
@@ -86,7 +75,7 @@
   --space-2xl: 42px;
   --space-3xl: 68px;
 
-  /* ===== BORDER RADIUS — Clean & Round ===== */
+  
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -95,29 +84,24 @@
   --radius-2xl: 40px;
   --radius-full: 9999px;
 
-  /* ===== TYPOGRAPHY — Golden Ratio Scale ===== */
-  /*  Base: 1rem (16px)
-   *  Down: 16 / 1.618 = 9.9 → 0.618rem
-   *  Down: 0.618 × 1.272 = 0.786 → middle step
-   *  Up: 16 × 1.618 = 25.9 → 1.618rem
-   *  Up: 25.9 × 1.618 = 41.9 → 2.618rem
-   */
+  
+  
   --text-xs: 0.618rem;
-  /* ~10px — tiny labels */
+  
   --text-sm: 0.75rem;
-  /* ~12px — captions, badges */
+  
   --text-base: 0.875rem;
-  /* ~14px — body text */
+  
   --text-md: 1rem;
-  /* 16px  — default */
+  
   --text-lg: 1.236rem;
-  /* ~20px — sub-headings (φ^0.5) */
+  
   --text-xl: 1.618rem;
-  /* ~26px — headings (φ) */
+  
   --text-2xl: 2.618rem;
-  /* ~42px — display/hero (φ²) */
+  
 
-  /* ===== SIZING — Golden Ratio ===== */
+  
   --size-icon-sm: 16px;
   --size-icon: 20px;
   --size-icon-lg: 26px;
@@ -126,18 +110,18 @@
   --size-avatar: 42px;
   --size-avatar-lg: 68px;
   --size-touch: 42px;
-  /* Minimum touch target */
+  
   --size-touch-lg: 68px;
 
   --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro', 'system-ui', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro', 'system-ui', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
-  /* Transitions */
+  
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
   --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Morphing — spring curve for size / shape changes */
+  
   --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
   --transition-morph:
@@ -154,13 +138,13 @@
     color          180ms ease,
     border-color   180ms ease;
 
-  /* Layout — Golden Ratio */
+  
   --nav-height: 68px;
   --max-width: 430px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* ===== Reset & Base ===== */
+
 *,
 *::before,
 *::after {
@@ -175,11 +159,11 @@ html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Trick: Top 50% is dark green, bottom 50% is white */
+  
   background-color: #ffffff;
   background-image: linear-gradient(to bottom, #04241d 50%, #ffffff 50%);
   background-repeat: no-repeat;
-  overscroll-behavior: auto;
+  overscroll-behavior: none;
 }
 
 body {
@@ -194,7 +178,7 @@ body {
   font-size: var(--text-base);
   line-height: 1.5;
   overflow-x: hidden;
-  overscroll-behavior: auto;
+  overscroll-behavior: none;
   min-height: 100vh;
   min-height: 100dvh;
 }
@@ -234,12 +218,7 @@ ol {
   list-style: none;
 }
 
-/* ===== Global Morphing Transition =====
-   Applies spring-based size transitions to all interactive elements.
-   Uses will-change: transform to keep GPU-composited where possible.
-   Properties that trigger layout (width/height/padding) use --ease-spring
-   so expanding elements feel snappy and alive instead of mechanical.
-   ======================================= */
+
 button,
 a,
 [role="button"],
@@ -277,7 +256,7 @@ a,
   will-change: transform;
 }
 
-/* Expanding containers that use max-height reveal */
+
 .db-field-drop,
 .settings__alerts,
 .analysis__insight-desc,
@@ -289,7 +268,7 @@ a,
     transform  280ms var(--ease-spring);
 }
 
-/* Active / pressed scale feedback */
+
 button:active,
 [role="button"]:active,
 .db-hero__pill--clickable:active {
@@ -297,7 +276,7 @@ button:active,
   transition-duration: 80ms;
 }
 
-/* ===== App Container ===== */
+
 .app-container {
   width: 100%;
   max-width: var(--max-width);
@@ -312,7 +291,7 @@ button:active,
   isolation: isolate;
 }
 
-/* ===== Fixed Overlay Wrapper ===== */
+
 .fixed-overlay-wrapper {
   position: fixed;
   inset: 0;
@@ -343,11 +322,11 @@ button:active,
   pointer-events: none;
 }
 
-/* ===== Page Layout ===== */
+
 .page {
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 0;  /* each page controls its own padding */
+  padding: 0;  
   padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + var(--space-xl));
   position: relative;
   z-index: 1;
@@ -369,20 +348,20 @@ button:active,
   letter-spacing: -0.02em;
   color: var(--text-primary);
   text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
-  /* Improve contrast */
+  
 }
 
 .page-subtitle {
   font-size: var(--text-sm);
   color: var(--text-secondary);
-  /* Darker for better contrast */
+  
   font-weight: 500;
   margin-top: var(--space-xs);
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
-/* ===== Liquid Glass Card ===== */
-/* In new pages (light bg) glass-card renders as a clean white card */
+
+
 .glass-card {
   background: #fff;
   border-radius: 18px;
@@ -405,7 +384,7 @@ button:active,
   box-shadow: 0 6px 24px rgba(12, 94, 74, 0.14);
 }
 
-/* ===== Section ===== */
+
 .section {
   margin-bottom: 20px;
 }
@@ -414,7 +393,7 @@ button:active,
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-lg); /* More breathing room for header */
+  margin-bottom: var(--space-lg); 
 }
 
 .section-title {
@@ -438,18 +417,18 @@ button:active,
   opacity: 0.7;
 }
 
-/* ===== Stat Cards Grid ===== */
+
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-lg); /* 16px gap instead of 10px */
+  gap: var(--space-lg); 
 }
 
 .stat-grid--3 {
   grid-template-columns: repeat(3, 1fr);
 }
 
-/* ===== Buttons — φ proportions ===== */
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -505,7 +484,7 @@ button:active,
   font-size: var(--text-md);
 }
 
-/* ===== Toggle Switch — φ sized ===== */
+
 .toggle {
   position: relative;
   width: 52px;
@@ -549,7 +528,7 @@ button:active,
   background: #ffffff;
 }
 
-/* ===== Badge — φ sized ===== */
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -582,7 +561,7 @@ button:active,
   color: var(--accent-teal);
 }
 
-/* ===== Scrollbar ===== */
+
 ::-webkit-scrollbar {
   display: none;
   width: 0;
@@ -590,11 +569,11 @@ button:active,
 }
 
 * {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
 }
 
-/* ===== Animations ===== */
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -695,7 +674,7 @@ button:active,
   animation-delay: 0.25s;
 }
 
-/* ===== Tab Pills — φ proportions ===== */
+
 .tab-pills {
   display: flex;
   background: var(--surface-muted);
@@ -722,7 +701,7 @@ button:active,
   box-shadow: var(--shadow-btn);
 }
 
-/* ===== Responsive ===== */
+
 @media (max-width: 430px) {
   :root {
     --space-lg: 14px;

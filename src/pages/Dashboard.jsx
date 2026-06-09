@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback } from 'react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import {
   Droplets, Thermometer, Sun, Wind, Leaf, Zap, Bell,
   ChevronDown, Calendar, X, Check, Plus, MapPin, Activity, UserCircle
@@ -14,7 +13,7 @@ import { parseGeminiError, executeWithGeminiFallback } from '../lib/geminiUtils'
 import './Dashboard.css';
 import hydroImg from '../assets/hydroponic.jpg';
 
-/* ── Static chart data ───────────────────────────────────────── */
+
 const TIME_RANGES = ['3D', '1W', '1M', 'Custom'];
 
 const SENSOR_HISTORY = {
@@ -43,7 +42,7 @@ const SENSOR_HISTORY = {
   ],
 };
 
-// Generate once at module level (stable across renders)
+
 const DAILY_DATA = (() => {
   const now = new Date();
   return Array.from({ length: 30 }, (_, i) => {
@@ -51,13 +50,13 @@ const DAILY_DATA = (() => {
     d.setDate(d.getDate() - (29 - i));
     return {
       time: `${d.getMonth() + 1}/${d.getDate()}`,
-      soil: 55 + ((i * 7 + 13) % 26),         // deterministic pseudo-random
+      soil: 55 + ((i * 7 + 13) % 26),         
       uv:   parseFloat((1.5 + (i * 3 % 7)).toFixed(1)),
     };
   });
 })();
 
-/* ── Helpers ─────────────────────────────────────────────────── */
+
 const fmt = (val, unit = '', decimals = 1) =>
   val != null ? `${parseFloat(val).toFixed(decimals)}${unit}` : null;
 
@@ -81,7 +80,7 @@ export default function Dashboard() {
 
   const plantName = cropProfile?.cropName || 'Hydroponic';
 
-  /* ── State ───────────────────────────────────── */
+  
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResult,  setAiResult]  = useState(null);
   const [aiError,   setAiError]   = useState(null);
@@ -91,7 +90,7 @@ export default function Dashboard() {
   const [customFrom, setCustomFrom] = useState('');
   const [customTo,   setCustomTo]   = useState('');
 
-  /* ── Derived values ──────────────────────────── */
+  
   const isOnline    = backendConnected || esp32Connected;
   const unreadCount = useMemo(() => alerts.filter(a => !a.read).length, [alerts]);
 
@@ -119,7 +118,7 @@ export default function Dashboard() {
     return chartRange === '1M' ? DAILY_DATA : (SENSOR_HISTORY[chartRange] || []);
   }, [chartRange, customFrom, customTo]);
 
-  /* ── Sensor tiles ────────────────────────────── */
+  
   const sensors = useMemo(() => [
     {
       icon: Droplets, label: t('soil'),
@@ -160,7 +159,7 @@ export default function Dashboard() {
     },
   ], [t, esp32Connected, sensorData, healthScore, weatherUV, displayTemp, displayHumidity, weatherWind]);
 
-  /* ── Actions ─────────────────────────────────── */
+  
   const runAnalysis = useCallback(async () => {
     if (aiLoading) return;
     setAiLoading(true); setAiResult(null); setAiError(null);
@@ -202,11 +201,11 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
     }
   }, [aiLoading, lang, alerts, cropProfile, harvestInfo, sensorData, displayTemp, displayHumidity, weatherUV, weatherWind, healthScore, realWeather, t]);
 
-  /* ── Render ──────────────────────────────────── */
+  
   return (
     <div className="db-root">
 
-      {/* ══════════════ NOTIFICATION PANEL ══════════════ */}
+      
       {notifOpen && (
         <div className="db-overlay" onClick={() => setNotifOpen(false)}>
           <div className="db-notif" onClick={e => e.stopPropagation()}>
@@ -234,13 +233,13 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
         </div>
       )}
 
-      {/* ══════════════ HERO ══════════════ */}
+      
       <div className="db-hero">
         <img src={hydroImg} alt="" className="db-hero__bg" />
         <div className="db-hero__overlay" />
 
         <div className="db-hero__content">
-          {/* Top bar */}
+          
           <div className="db-hero__topbar">
             <div className="db-hero__left">
               <button
@@ -269,7 +268,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
             </button>
           </div>
 
-          {/* Title */}
+          
           <div className="db-hero__titles">
             <p className="db-hero__greeting">{t('welcome_to')}</p>
             <h1 className="db-hero__name">TRI-HITA</h1>
@@ -280,7 +279,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
             )}
           </div>
 
-          {/* Stat pills */}
+          
           <div className="db-hero__pills">
             <div className="db-hero__pill">
               <span className="db-hero__pill-val">
@@ -303,10 +302,10 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
         </div>
       </div>
 
-      {/* ══════════════ BODY ══════════════ */}
+      
       <div className="db-body">
 
-        {/* Field selector */}
+        
         <div className="db-section-hd">
           <span className="db-section-title">{t('your_field')}</span>
           <span className="db-section-tag">{realWeather.description || t('live_data')}</span>
@@ -337,7 +336,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
           )}
         </div>
 
-        {/* Live sensor card */}
+        
         <div className="db-sensor-card">
           <div className="db-sensor-card__img-wrap">
             <img src={hydroImg} alt={cropProfile?.cropName || t('field_name')} className="db-sensor-card__img" />
@@ -379,7 +378,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
           </div>
         </div>
 
-        {/* AI Analysis */}
+        
         <div
           className={`db-ai ${aiResult || aiLoading ? 'db-ai--active' : ''}`}
           onClick={runAnalysis}
@@ -403,7 +402,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
                 {(() => {
                   let charIndex = 0;
                   return aiResult.split('\n').filter(l => l.trim()).map((line, li) => {
-                    // Split line by bold markers, then each segment by char
+                    
                     const parts = line.split(/(\*\*.*?\*\*)/);
                     return (
                       <p key={li} style={{ fontSize: '12.5px', color: '#333', lineHeight: 1.75, margin: '2px 0' }}>
@@ -413,7 +412,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
                           const chars = text.split('');
                           return chars.map((ch, ci) => {
                             const delay = charIndex++ * 8;
-                            // If it's a space, preserve it with white-space: pre or using a non-breaking space
+                            
                             if (ch === ' ') {
                               return <span key={`${pi}-${ci}`} className="db-ai__char"> </span>;
                             }
@@ -441,7 +440,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
           )}
         </div>
 
-        {/* Harvest Progress */}
+        
         <div className="db-section-hd" style={{ marginTop: 8 }}>
           <span className="db-section-title">{t('harvest_progress')}</span>
           <span className="db-section-tag">{harvestInfo.daysToHarvest} {t('days_left')}</span>
@@ -458,7 +457,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
           </div>
         </div>
 
-        {/* Sensor History Chart */}
+        
         <div className="db-section-hd" style={{ marginTop: 8 }}>
           <span className="db-section-title">{t('sensor_history')}</span>
           <div className="db-range-wrap">

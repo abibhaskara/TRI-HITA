@@ -1,6 +1,6 @@
-/* ===== AI Chatbot — Dashboard Style ===== */
 
-/* Floating Action Button */
+
+
 .ai-chat-fab {
     position: relative;
     z-index: 999;
@@ -43,7 +43,7 @@
         0 2px 8px rgba(229, 57, 53, 0.15);
 }
 
-/* Backdrop */
+
 .ai-chat-backdrop {
     position: absolute;
     inset: 0;
@@ -62,7 +62,7 @@
     pointer-events: auto;
 }
 
-/* Chat Panel */
+
 .ai-chat-panel {
     position: fixed;
     height: 80vh;
@@ -71,11 +71,11 @@
     width: 100%;
     max-width: var(--max-width, 430px);
     z-index: 1001;
-    /* Must cover LivingNavbar */
+    
     pointer-events: none;
     opacity: 0;
 
-    /* Move below screen when closed */
+    
     transform: translateX(-50%) translateY(100%);
 
     margin-bottom: 0;
@@ -92,7 +92,7 @@
     transition: opacity 0.3s cubic-bezier(0.34, 1.2, 0.64, 1), transform 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
 }
 
-/* Pseudo-element to act as a white bleed behind the keyboard */
+
 .ai-chat-panel::after {
     content: '';
     position: absolute;
@@ -117,7 +117,7 @@
     padding-bottom: 0;
 }
 
-/* Header */
+
 .ai-chat-header {
     display: flex;
     align-items: center;
@@ -182,7 +182,7 @@
     color: var(--text-primary);
 }
 
-/* Messages Scroll Area */
+
 .ai-chat-messages {
     flex: 1;
     overflow-y: auto;
@@ -206,7 +206,7 @@
     border-radius: var(--radius-full);
 }
 
-/* Empty State */
+
 .ai-chat-empty {
     display: flex;
     flex-direction: column;
@@ -242,7 +242,7 @@
     max-width: 280px;
 }
 
-/* Quick Prompt Chips */
+
 .ai-chat-quick-prompts {
     display: flex;
     flex-wrap: wrap;
@@ -275,7 +275,7 @@
     transform: translateY(0);
 }
 
-/* Message Bubbles */
+
 .ai-chat-message {
     display: flex;
     align-items: flex-end;
@@ -340,7 +340,7 @@
     border: 1px solid rgba(220, 107, 107, 0.2);
 }
 
-/* Loading dots */
+
 .ai-chat-message__bubble--loading {
     display: flex;
     align-items: center;
@@ -383,7 +383,7 @@
     }
 }
 
-/* Input Area */
+
 .ai-chat-input-area {
     padding: var(--space-md) var(--space-lg) 20px;
     border-top: 1px solid var(--border-subtle);
@@ -481,7 +481,7 @@
     }
 }
 
-/* Mobile adjustments */
+
 @media (max-width: 639px) {
     .ai-chat-fab {
         width: var(--size-avatar);

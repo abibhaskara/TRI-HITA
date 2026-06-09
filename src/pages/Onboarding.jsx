@@ -90,7 +90,7 @@ export default function Onboarding() {
   const { lang, changeLang, t } = useLang();
   const [step, setStep] = useState(1);
 
-  // Form states
+  
   const [cropType, setCropType] = useState('lettuce');
   const [customCropName, setCustomCropName] = useState('');
   const [variety, setVariety] = useState('');
@@ -100,7 +100,7 @@ export default function Onboarding() {
   const [irrigationMethod, setIrrigationMethod] = useState('drip_irrigation');
   const [useCustomThresholds, setUseCustomThresholds] = useState(false);
 
-  // Thresholds states
+  
   const [optimalMoisture, setOptimalMoisture] = useState('75');
   const [optimalTemp, setOptimalTemp] = useState('22');
   const [optimalHumidity, setOptimalHumidity] = useState('70');
@@ -128,7 +128,7 @@ export default function Onboarding() {
     if (step < 4) {
       setStep(prev => prev + 1);
     } else {
-      // Finalize and submit
+      
       const finalCropName = getActiveCropName();
       const finalProfile = {
         cropName: finalCropName,
@@ -158,7 +158,7 @@ export default function Onboarding() {
     <div className="onboard-bg">
       <div className="onboard-container">
         
-        {/* Top Header Row with Lang Selector */}
+        
         <div className="onboard-header">
           <div className="onboard-logo-area">
             <div className="onboard-icon-wrap">
@@ -177,7 +177,7 @@ export default function Onboarding() {
           </div>
         </div>
 
-        {/* Wizard Main Card */}
+        
         <div className="onboard-card glass-card">
           <div className="onboard-card__head">
             <span className="onboard-step-indicator">{t('step')} {step} / 4</span>
@@ -185,12 +185,12 @@ export default function Onboarding() {
             <p className="onboard-subtitle">{t('onboarding_subtitle')}</p>
           </div>
 
-          {/* Progress Bar */}
+          
           <div className="onboard-progress-bar">
             <div className="onboard-progress-fill" style={{ width: `${(step / 4) * 100}%` }} />
           </div>
 
-          {/* Form Step Contents */}
+          
           <div className="onboard-content">
             
             {step === 1 && (
@@ -438,7 +438,7 @@ export default function Onboarding() {
 
           </div>
 
-          {/* Action Footer */}
+          
           <div className="onboard-footer">
             {step > 1 ? (
               <button className="onboard-btn-back" onClick={handleBack}>

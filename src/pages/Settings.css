@@ -1,15 +1,13 @@
-/* ================================================================
-   Settings Page — Smart Garden AI style
-   ================================================================ */
+
 
 .settings {
     background: #f3f4f0;
     font-family: var(--font-body, 'Inter', sans-serif);
     padding: 0;
-    padding-bottom: 100px; /* room for bottom nav */
+    padding-bottom: 100px; 
 }
 
-/* ── White body ─────────────────────────────────────────────────── */
+
 .settings .page-body {
     background: #f3f4f0;
     border-radius: 28px 28px 0 0;
@@ -32,7 +30,7 @@
 
 
 
-/* Option rows */
+
 .settings__option {
     display: flex;
     align-items: center;
@@ -93,7 +91,7 @@
     margin-left: auto;
 }
 
-/* Group with internal rows */
+
 .settings__options-group {
     background: #fff;
     border-radius: 18px;
@@ -111,13 +109,13 @@
 
 .settings__option-row .settings__option-label { flex: 1; }
 
-/* Divider */
+
 .settings__divider {
     height: 1px;
     background: #f0f0f0;
 }
 
-/* Chevron */
+
 .settings__chevron {
     color: #ccc;
     transition: transform 0.2s;
@@ -128,7 +126,7 @@
     color: #0c5e4a;
 }
 
-/* Alerts list */
+
 .settings__alerts {
     display: flex;
     flex-direction: column;
@@ -181,7 +179,7 @@
     flex-shrink: 0;
 }
 
-/* Select */
+
 .settings__select {
     -webkit-appearance: none;
     appearance: none;
@@ -203,7 +201,7 @@
 }
 .settings__select:focus { border-color: rgba(12, 94, 74,0.4); }
 
-/* Toggle */
+
 .toggle {
     position: relative;
     display: inline-block;
@@ -235,7 +233,7 @@
 .toggle input:checked + .toggle-slider { background: #0c5e4a; }
 .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
 
-/* About */
+
 .settings__about {
     display: flex;
     align-items: center;
@@ -271,7 +269,7 @@
     margin-top: 4px;
 }
 
-/* Location section */
+
 .settings__loc-group {
     padding: 16px;
 }
@@ -349,7 +347,7 @@
     font-weight: 500;
 }
 
-/* Account card */
+
 .settings__account-card {
     display: flex;
     align-items: center;

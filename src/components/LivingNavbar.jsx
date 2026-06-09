@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { motion } from 'framer-motion'; 
 import { LayoutDashboard, Settings, User, FileText } from 'lucide-react';
 import { useNavDirection } from '../App';
 import { useLang } from '../context/LanguageContext';
@@ -36,15 +36,14 @@ export default function LivingNavbar() {
         const currentIndex = navItems.findIndex((i) => i.path === itemPath);
         if (hoveredIndex === -1) return 0;
 
-        // Logic 3. Magnetic Displacement
-        if (currentIndex < hoveredIndex) return -5; // Geser Kiri
-        if (currentIndex > hoveredIndex) return 5;  // Geser Kanan
-        return 0; // Target itself
+        
+        if (currentIndex < hoveredIndex) return -5; 
+        if (currentIndex > hoveredIndex) return 5;  
+        return 0; 
     };
 
     return (
         <motion.nav
-            layout
             className="living-navbar"
             onMouseLeave={() => setHoveredPath(null)}
         >

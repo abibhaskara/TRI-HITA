@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Brain, ChevronRight, MapPin, TrendingUp, AlertTriangle, ShieldCheck, Loader, Sun } from 'lucide-react';
 import { AreaChart, Area, XAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { useData } from '../context/DataContext';
@@ -14,7 +13,7 @@ const AI_INSIGHTS = [
   { type: 'info',    icon: TrendingUp,   titleKey: 'harvest_forecast',    topic: 'harvest timeline and readiness' },
 ];
 
-// Day abbreviation lookup — module-level constant, not recreated on each render
+
 const DAY_ABBR = {
   Sun: { en: 'Sun', id: 'Min', ban: 'Rad' },
   Mon: { en: 'Mon', id: 'Sen', ban: 'Som' },
@@ -48,12 +47,12 @@ export default function Analysis() {
   const [insightLoading,  setInsightLoading]  = useState({});
   const [forecastTab,     setForecastTab]     = useState('temp');
 
-  // Use ref to track generated insights without adding to useCallback deps
+  
   const insightDescsRef = useRef(insightDescs);
   insightDescsRef.current = insightDescs;
 
   const generateInsightDesc = useCallback(async (idx, topic) => {
-    if (insightDescsRef.current[idx]) return; // already generated
+    if (insightDescsRef.current[idx]) return; 
     setInsightLoading(prev => ({ ...prev, [idx]: true }));
     try {
       const isOnline        = esp32Connected || backendConnected;
@@ -98,14 +97,14 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
     });
   }, [generateInsightDesc]);
 
-  // Stable memoized tab style
+  
   const tabStyle      = useMemo(() => TAB_COLORS[forecastTab] || TAB_COLORS.temp, [forecastTab]);
   const currentDayName = useMemo(() => getDayName(new Date(), lang), [lang]);
 
   return (
     <div className="page analysis">
 
-      {/* Dark green hero header */}
+      
       <div className="page-hero animate-in">
         <div className="page-hero__top">
           <div>
@@ -119,10 +118,10 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
         </div>
       </div>
 
-      {/* White body */}
+      
       <div className="page-body">
 
-        {/* Weather Forecast */}
+        
         <div className="section animate-in animate-delay-1">
           <div className="pg-section-header">
             <span className="pg-section-title">{t('weather_forecast')}</span>
@@ -152,7 +151,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
               </div>
             </div>
 
-            {/* Stats row */}
+            
             <div className="forecast-stats-grid">
               <div className="forecast-stat-col">
                 <span className="forecast-stat-val">{realWeather.hourly?.[0]?.rain || 0}%</span>
@@ -168,7 +167,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
               </div>
             </div>
 
-            {/* Forecast Tabs */}
+            
             <div className="forecast-tabs">
               {['temp', 'rain', 'wind'].map(tab => (
                 <button
@@ -181,7 +180,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
               ))}
             </div>
 
-            {/* Forecast Chart */}
+            
             <div className="forecast-chart-wrap">
               <ResponsiveContainer width="100%" height={120}>
                 <AreaChart data={realWeather.hourly || []} margin={{ top: 18, right: 12, left: 12, bottom: 0 }}>
@@ -209,7 +208,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
               </ResponsiveContainer>
             </div>
 
-            {/* Daily weekly list */}
+            
             <div className="forecast-daily-list">
               {realWeather.daily?.map((d, idx) => (
                 <div key={idx} className={`forecast-daily-item ${idx === 0 ? 'forecast-daily-item--active' : ''}`}>
@@ -227,7 +226,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
           </div>
         </div>
 
-        {/* AI Insights */}
+        
         <div className="section animate-in animate-delay-2">
           <div className="section-header">
             <span className="section-title">{t('ai_insights')}</span>

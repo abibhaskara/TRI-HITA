@@ -10,13 +10,13 @@ export const LANGUAGES = [
 
 const translations = {
   en: {
-    // Bottom Nav
+    
     nav_dashboard: 'Dashboard',
     nav_analysis: 'Reports',
     nav_settings: 'Settings',
     nav_profile: 'Profile',
 
-    // Dashboard Hero
+    
     hi: 'Hi',
     welcome_to: 'Welcome to',
     health: 'Health',
@@ -28,14 +28,14 @@ const translations = {
     my_fields: 'My Hydroponic',
     your_field: 'Your Hydroponic',
 
-    // Field card
+    
     field_name: 'Hydroponic System',
     field_desc: 'Monitor growth, watering and harvest cycles.',
     live: 'Live',
     live_data: 'Live Data',
     tap_to_scan: 'Tap to scan nearby devices',
 
-    // Device scan modal
+    
     scanning_title: 'Scanning for devices…',
     scanning_sub: 'Make sure your device is powered on and in range.',
     scan_failed_title: 'No devices found',
@@ -43,7 +43,7 @@ const translations = {
     retry: 'Retry',
     exit: 'Exit',
 
-    // AI Analysis (Dashboard)
+    
     ai_analysis: 'AI Reports',
     tap_to_analyze: 'Tap to analyze',
     re_analyze: '↻ Re-analyze',
@@ -51,13 +51,13 @@ const translations = {
     ai_analysis_desc: "Run a live analysis of your plantation's current health, sensor data, and harvest timeline.",
     esp32_offline_status: 'ESP32 Offline — Soil N/A · Weather active',
 
-    // Harvest
+    
     harvest_progress: 'Harvest Progress',
     days_left: 'days left',
     day: 'Day',
     of: 'of',
 
-    // Chart
+    
     sensor_history: 'Sensor History',
     soil: 'Soil',
     uv: 'UV',
@@ -66,13 +66,13 @@ const translations = {
     no_data: 'No data',
     select_date_range: 'Select a date range above',
 
-    // Power
+    
     power_system: 'Power System',
     charging: 'Charging',
     battery: 'Battery',
     solar: 'Solar',
 
-    // Notifications
+    
     notifications: 'Notifications',
     no_notifications: 'No notifications',
     add_new_device: 'Add New Device',
@@ -84,7 +84,7 @@ const translations = {
     alert_hum_low: 'Low air humidity detected',
     alert_hum_high: 'High air humidity detected',
 
-    // Analysis page
+    
     ai_insights: 'AI Insights',
     zone_overview: 'Zone Overview',
     zones: 'zones',
@@ -108,7 +108,7 @@ const translations = {
     wind_label: 'Wind',
     temperature_label: 'Temperature',
 
-    // Settings
+    
     settings_title: 'Settings',
     system_config: 'System Configuration',
     sprinkler_control: 'Sprinkler Control',
@@ -131,7 +131,7 @@ const translations = {
     new_alerts: 'new',
     seconds_short: 'sec',
 
-    // Location (Settings)
+    
     device_location: 'Device Location (IoT)',
     lock_location: 'Lock Location',
     lock_location_desc: 'Lock forecast coordinates to a fixed point',
@@ -140,7 +140,7 @@ const translations = {
     location_error: 'Failed to detect location',
     geolocation_unsupported: 'Geolocation not supported',
 
-    // Account
+    
     account: 'Account Settings',
     personal_info: 'Personal Information',
     full_name: 'Full Name',
@@ -160,7 +160,7 @@ const translations = {
     enter_photo_url: 'Enter new photo URL:',
     enter_your_name: 'Enter your name',
 
-    // AI Chatbot
+    
     ask_ai: 'Ask TRI-HITA AI...',
     ai_greeting: 'Hello! I am TRI-HITA AI. How can I help you optimize your hydroponic system today?',
     type_message: 'Type a message...',
@@ -171,7 +171,7 @@ const translations = {
     prompt_irrigation: 'Are there any irrigation risks today?',
     prompt_harvest: 'Project harvest readiness.',
 
-    // Onboarding
+    
     continue: 'Continue',
     get_started: 'Get Started',
     tagline: 'Smart Plant Monitoring',
@@ -209,13 +209,13 @@ const translations = {
   },
 
   id: {
-    // Bottom Nav
+    
     nav_dashboard: 'Beranda',
     nav_analysis: 'Laporan',
     nav_settings: 'Pengaturan',
     nav_profile: 'Profil',
 
-    // Dashboard Hero
+    
     hi: 'Hai',
     welcome_to: 'Selamat datang di',
     health: 'Kesehatan',
@@ -227,14 +227,14 @@ const translations = {
     my_fields: 'Hidroponik Saya',
     your_field: 'Hidroponik Anda',
 
-    // Field card
+    
     field_name: 'Sistem Hidroponik',
     field_desc: 'Pantau pertumbuhan, penyiraman, dan siklus panen.',
     live: 'Langsung',
     live_data: 'Data Langsung',
     tap_to_scan: 'Ketuk untuk memindai perangkat terdekat',
 
-    // Device scan modal
+    
     scanning_title: 'Mencari perangkat…',
     scanning_sub: 'Pastikan perangkat Anda menyala dan dalam jangkauan.',
     scan_failed_title: 'Perangkat tidak ditemukan',
@@ -242,7 +242,7 @@ const translations = {
     retry: 'Coba Lagi',
     exit: 'Keluar',
 
-    // AI Analysis (Dashboard)
+    
     ai_analysis: 'Laporan AI',
     tap_to_analyze: 'Ketuk untuk analisis',
     re_analyze: '↻ Analisis Ulang',
@@ -250,13 +250,13 @@ const translations = {
     ai_analysis_desc: 'Jalankan analisis langsung kesehatan hidroponik, data sensor, dan jadwal panen Anda.',
     esp32_offline_status: 'ESP32 Offline — Kelembapan Tanah N/A · Cuaca aktif',
 
-    // Harvest
+    
     harvest_progress: 'Progres Panen',
     days_left: 'hari lagi',
     day: 'Hari',
     of: 'dari',
 
-    // Chart
+    
     sensor_history: 'Riwayat Sensor',
     soil: 'Tanah',
     uv: 'UV',
@@ -265,13 +265,13 @@ const translations = {
     no_data: 'Tidak ada data',
     select_date_range: 'Pilih rentang tanggal di atas',
 
-    // Power
+    
     power_system: 'Sistem Daya',
     charging: 'Mengisi',
     battery: 'Baterai',
     solar: 'Surya',
 
-    // Notifications
+    
     notifications: 'Notifikasi',
     no_notifications: 'Tidak ada notifikasi',
     add_new_device: 'Tambah Perangkat Baru',
@@ -283,7 +283,7 @@ const translations = {
     alert_hum_low: 'Kelembapan udara rendah terdeteksi',
     alert_hum_high: 'Kelembapan udara tinggi terdeteksi',
 
-    // Analysis page
+    
     ai_insights: 'Wawasan AI',
     zone_overview: 'Gambaran Zona',
     zones: 'zona',
@@ -307,7 +307,7 @@ const translations = {
     wind_label: 'Angin',
     temperature_label: 'Suhu',
 
-    // Settings
+    
     settings_title: 'Pengaturan',
     system_config: 'Konfigurasi Sistem',
     sprinkler_control: 'Kontrol Sprinkler',
@@ -330,7 +330,7 @@ const translations = {
     new_alerts: 'baru',
     seconds_short: 'dtk',
 
-    // Location (Settings)
+    
     device_location: 'Lokasi Alat (IoT)',
     lock_location: 'Kunci Lokasi',
     lock_location_desc: 'Kunci koordinat ramalan cuaca di satu titik',
@@ -339,7 +339,7 @@ const translations = {
     location_error: 'Gagal mendeteksi lokasi',
     geolocation_unsupported: 'Geolokasi tidak didukung',
 
-    // Account
+    
     account: 'Pengaturan Akun',
     personal_info: 'Informasi Pribadi',
     full_name: 'Nama Lengkap',
@@ -359,7 +359,7 @@ const translations = {
     enter_photo_url: 'Masukkan URL foto baru:',
     enter_your_name: 'Masukkan nama Anda',
 
-    // AI Chatbot
+    
     ask_ai: 'Tanya TRI-HITA AI...',
     ai_greeting: 'Halo! Saya TRI-HITA AI. Bagaimana saya dapat membantu mengoptimalkan sistem hidroponik Anda hari ini?',
     type_message: 'Ketik pesan...',
@@ -370,7 +370,7 @@ const translations = {
     prompt_irrigation: 'Apakah ada risiko irigasi hari ini?',
     prompt_harvest: 'Proyeksi kesiapan panen.',
 
-    // Onboarding
+    
     continue: 'Lanjutkan',
     get_started: 'Mulai',
     tagline: 'Pemantauan Tanaman Cerdas',
@@ -408,13 +408,13 @@ const translations = {
   },
 
   ban: {
-    // Bottom Nav
+    
     nav_dashboard: 'Umah',
     nav_analysis: 'Laporan',
     nav_settings: 'Setelan',
     nav_profile: 'Profil',
 
-    // Dashboard Hero
+    
     hi: 'Om Swastyastu',
     welcome_to: 'Rahajeng rauh ring',
     health: 'Kasehatan',
@@ -426,14 +426,14 @@ const translations = {
     my_fields: 'Hidroponik Tiange',
     your_field: 'Hidroponik Palungguh',
 
-    // Field card
+    
     field_name: 'Sistem Hidroponik',
     field_desc: 'Pantau patumbuhan, penyiraman, lan siklus panen.',
     live: 'Langsung',
     live_data: 'Data Langsung',
     tap_to_scan: 'Sentuh mangda mapindai alat sane sampun wenten',
 
-    // Device scan modal
+    
     scanning_title: 'Ngrereh alat…',
     scanning_sub: 'Pastiang alat sane wenten sampun nyalain lan sada rauh.',
     scan_failed_title: 'Alat nenten kapanggihin',
@@ -441,7 +441,7 @@ const translations = {
     retry: 'Cobian Malih',
     exit: 'Medal',
 
-    // AI Analysis (Dashboard)
+    
     ai_analysis: 'Laporan AI',
     tap_to_analyze: 'Sentuh mangda nganalisis',
     re_analyze: '↻ Analisis Malih',
@@ -449,13 +449,13 @@ const translations = {
     ai_analysis_desc: 'Laksanayang analisis langsung kasehatan hidroponik, data sensor, lan jadwal panen Palungguh.',
     esp32_offline_status: 'ESP32 Medal — Tanah N/A · Cuaca aktif',
 
-    // Harvest
+    
     harvest_progress: 'Progres Panen',
     days_left: 'rahina malih',
     day: 'Rahina',
     of: 'saking',
 
-    // Chart
+    
     sensor_history: 'Riwayat Sensor',
     soil: 'Tanah',
     uv: 'UV',
@@ -464,13 +464,13 @@ const translations = {
     no_data: 'Nenten wenten data',
     select_date_range: 'Pilih rentang tanggal ring ajeng',
 
-    // Power
+    
     power_system: 'Sistem Daya',
     charging: 'Ngisi',
     battery: 'Baterai',
     solar: 'Surya',
 
-    // Notifications
+    
     notifications: 'Pawartaan',
     no_notifications: 'Nenten wenten pawartaan',
     add_new_device: 'Tambah Alat Anyar',
@@ -482,7 +482,7 @@ const translations = {
     alert_hum_low: 'Kelembaban udara bawak kapanggihin',
     alert_hum_high: 'Kelembaban udara tegeh kapanggihin',
 
-    // Analysis page
+    
     ai_insights: 'Wicara AI',
     zone_overview: 'Gambaran Zona',
     zones: 'zona',
@@ -506,7 +506,7 @@ const translations = {
     wind_label: 'Angin',
     temperature_label: 'Suhu',
 
-    // Settings
+    
     settings_title: 'Setelan',
     system_config: 'Konfigurasi Sistem',
     sprinkler_control: 'Kontrol Sprinkler',
@@ -529,7 +529,7 @@ const translations = {
     new_alerts: 'anyar',
     seconds_short: 'dtk',
 
-    // Location (Settings)
+    
     device_location: 'Genah Alat (IoT)',
     lock_location: 'Kunci Genah',
     lock_location_desc: 'Kunci koordinat ramalan cuaca ring satu titik',
@@ -538,7 +538,7 @@ const translations = {
     location_error: 'Nenten prasida ngaptiang genah',
     geolocation_unsupported: 'Geolokasi nenten kaadukung',
 
-    // Account
+    
     account: 'Setelan Akun',
     personal_info: 'Informasi Pribadi',
     full_name: 'Adan Lengkap',
@@ -558,7 +558,7 @@ const translations = {
     enter_photo_url: 'Lebokang URL foto anyar:',
     enter_your_name: 'Lebokang adan Palungguh',
 
-    // AI Chatbot
+    
     ask_ai: 'Takonang ring TRI-HITA AI...',
     ai_greeting: 'Om Swastyastu! Tiang TRI-HITA AI. Sapunapi tiang prasida ngwantu ngoptimalang sistem hidroponik Palungguh rahina mangkin?',
     type_message: 'Ketik pawos...',
@@ -569,7 +569,7 @@ const translations = {
     prompt_irrigation: 'Wenten risikoning nguberin yeh rahina mangkin?',
     prompt_harvest: 'Proyeksi kasayagan panen.',
 
-    // Onboarding
+    
     continue: 'Nglanjutin',
     get_started: 'Miwit',
     tagline: 'Pemantauan Taneman Lantip',

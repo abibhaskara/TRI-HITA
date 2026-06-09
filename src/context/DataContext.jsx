@@ -18,7 +18,7 @@ const LOCATION_KEY = 'tri-hita_location_config';
 
 const DEFAULT_LOCATION = {
   isLocked: false,
-  latitude: -8.409518,  // Bali default
+  latitude: -8.409518,  
   longitude: 115.188919,
 };
 
@@ -44,7 +44,7 @@ export function DataProvider({ children }) {
     });
   }, []);
 
-  // ── ESP32 live data via MQTT over WebSocket ──────────────────────────────
+  
   const { esp32Data, esp32Connected, esp32Error } = useMqtt();
   const [weatherState, setWeatherState] = useState('sunny');
 
@@ -73,13 +73,13 @@ export function DataProvider({ children }) {
   const [backendConnected, setBackendConnected] = useState(false);
   const backendConnectedRef = useRef(false);
 
-  // ── Backend polling ──────────────────────────────────────────────────────
+  
   const fetchSensorData = useCallback(async () => {
     try {
       const data = await getLatestObservations();
       if (!Array.isArray(data) || data.length === 0) return;
 
-      const targetNodeId = 'b37eae24f4f1a39d49cd64a0a2c3430e';
+      const targetNodeId = import.meta.env.VITE_TARGET_NODE_ID || 'b37eae24f4f1a39d49cd64a0a2c3430e';
       const node = data.find(n =>
         n.node_id === targetNodeId || n.node === targetNodeId || n.id === targetNodeId
       ) || data[0];
@@ -114,10 +114,15 @@ export function DataProvider({ children }) {
     return () => clearInterval(poll);
   }, [fetchSensorData]);
 
-  // ── Weather fetching ─────────────────────────────────────────────────────
+  
   const fetchWeather = useCallback(async (lat, lon) => {
     try {
-      const owmKey = import.meta.env.VITE_OPENWEATHER_API_KEY || 'b37eae24f4f1a39d49cd64a0a2c3430e';
+      const owmKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+      if (!owmKey) {
+        console.warn('[fetchWeather] VITE_OPENWEATHER_API_KEY is not configured.');
+        setRealWeather(prev => ({ ...prev, loading: false, error: 'Weather API key missing' }));
+        return;
+      }
       const [weatherRes, forecastRes] = await Promise.all([
         fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${owmKey}`),
         fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${owmKey}`),
@@ -143,7 +148,7 @@ export function DataProvider({ children }) {
       const { desc, emoji } = getWmoInfo(wmoCode);
       const theme         = mapWmoToTheme(wmoCode, isDay);
 
-      // Build daily forecasts
+      
       const dailyMap = {};
       forecastData.list?.forEach(item => {
         const dayName = DAYS_OF_WEEK[new Date(item.dt * 1000).getDay()];
@@ -182,7 +187,7 @@ export function DataProvider({ children }) {
           }))
         : [];
 
-      // Prefer OWM city name; fall back to Nominatim
+      
       let city    = weatherData.name || null;
       let country = weatherData.sys?.country || null;
 
@@ -197,7 +202,7 @@ export function DataProvider({ children }) {
             city    = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || null;
             country = geo.address?.country_code?.toUpperCase() ?? null;
           }
-        } catch { /* ignore */ }
+        } catch {}
       }
 
       setWeatherState(theme);
@@ -209,7 +214,7 @@ export function DataProvider({ children }) {
     }
   }, []);
 
-  // Weather refresh every 10 minutes
+  
   useEffect(() => {
     const doFetch = () => {
       if (locationConfig.isLocked && locationConfig.latitude != null && locationConfig.longitude != null) {
@@ -232,7 +237,7 @@ export function DataProvider({ children }) {
     return () => clearInterval(refresh);
   }, [fetchWeather, locationConfig.isLocked, locationConfig.latitude, locationConfig.longitude]);
 
-  // ── Derived sensor values ────────────────────────────────────────────────
+  
   const { cropProfile } = useUser();
   const { lang } = useLang();
 
@@ -240,14 +245,14 @@ export function DataProvider({ children }) {
   const activeHumidity = sensorData.humidity    ?? (esp32Connected ? esp32Data.humidity    : null);
   const activeSoil     = sensorData.soilMoisture;
 
-  // Tick every 30 s to keep relative time labels fresh
+  
   const [, setTick] = useState(0);
   useEffect(() => {
     const timer = setInterval(() => setTick(t => t + 1), 30_000);
     return () => clearInterval(timer);
   }, []);
 
-  // ── Health score ─────────────────────────────────────────────────────────
+  
   const healthScore = useMemo(() => {
     const thresholds = getCropThresholds(cropProfile);
     return computeHealthScore({
@@ -259,7 +264,7 @@ export function DataProvider({ children }) {
     });
   }, [activeSoil, activeHumidity, activeTemp, sensorData.lightLevel, cropProfile]);
 
-  // ── Alert generation ─────────────────────────────────────────────────────
+  
   const alertsRef = useRef(alerts);
   useEffect(() => { alertsRef.current = alerts; }, [alerts]);
 
@@ -327,12 +332,12 @@ export function DataProvider({ children }) {
     }
   }, [activeSoil, activeTemp, activeHumidity, cropProfile, lang]);
 
-  // ── Sprinklers ───────────────────────────────────────────────────────────
+  
   const toggleSprinkler = useCallback((zoneId) =>
     setSprinklers(prev => ({ ...prev, [zoneId]: !prev[zoneId] }))
   , []);
 
-  // ── Alert actions ────────────────────────────────────────────────────────
+  
   const persistAlerts = (next) => {
     try { localStorage.setItem('tri-hita_alerts', JSON.stringify(next)); }
     catch (e) { console.warn('[Storage] failed to save alerts:', e.message); }
@@ -343,7 +348,7 @@ export function DataProvider({ children }) {
     setAlerts(prev => persistAlerts(prev.map(a => a.id === id ? { ...a, read: true } : a)));
   }, []);
 
-  // ── Device scan ──────────────────────────────────────────────────────────
+  
   const [scanOpen, setScanOpen]   = useState(false);
   const [scanPhase, setScanPhase] = useState('idle');
 
@@ -363,7 +368,7 @@ export function DataProvider({ children }) {
     setScanPhase('idle');
   }, []);
 
-  // ── Formatted alerts ─────────────────────────────────────────────────────
+  
   const formattedAlerts = useMemo(() =>
     alerts.map(a => ({
       ...a,

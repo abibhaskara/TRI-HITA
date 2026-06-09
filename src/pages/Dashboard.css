@@ -1,8 +1,6 @@
-/* ================================================================
-   Dashboard — TRI-HITA Premium Design
-   ================================================================ */
 
-/* ── Root ─────────────────────────────────────────────────── */
+
+
 .db-root {
     display: flex;
     flex-direction: column;
@@ -12,7 +10,7 @@
     padding-bottom: 110px;
 }
 
-/* ── Shared overlay backdrop ──────────────────────────────── */
+
 .db-overlay {
     position: fixed;
     inset: 0;
@@ -36,7 +34,7 @@
     }
 }
 
-/* ── Icon button ──────────────────────────────────────────── */
+
 .db-icon-btn {
     width: 30px;
     height: 30px;
@@ -56,9 +54,7 @@
     color: #111;
 }
 
-/* ================================================================
-   NOTIFICATION PANEL
-   ================================================================ */
+
 .db-notif {
     width: 340px;
     max-width: calc(100vw - 32px);
@@ -171,9 +167,7 @@
     flex-shrink: 0;
 }
 
-/* ================================================================
-   SCAN OVERLAY
-   ================================================================ */
+
 .db-scan-overlay {
     position: absolute;
     inset: 0;
@@ -301,9 +295,7 @@
     opacity: 0.88;
 }
 
-/* ================================================================
-   HERO
-   ================================================================ */
+
 .db-hero {
     position: relative;
     min-height: 320px;
@@ -402,7 +394,7 @@
     padding: 0 3px;
 }
 
-/* ── Left group (account + location) ── */
+
 .db-hero__left {
     display: flex;
     align-items: center;
@@ -441,7 +433,7 @@
     border-radius: 50%;
 }
 
-/* ── Hero titles ── */
+
 .db-hero__titles {
     flex: 1;
     display: flex;
@@ -472,7 +464,7 @@
     color: rgba(255, 255, 255, 0.6);
 }
 
-/* ── Stat pills ── */
+
 .db-hero__pills {
     display: flex;
     gap: 8px;
@@ -518,9 +510,7 @@
     letter-spacing: 0.4px;
 }
 
-/* ================================================================
-   BODY
-   ================================================================ */
+
 .db-body {
     flex: 1;
     background: #f0f2ee;
@@ -531,7 +521,7 @@
     z-index: 3;
 }
 
-/* ── Section header ── */
+
 .db-section-hd {
     display: flex;
     align-items: center;
@@ -551,7 +541,7 @@
     font-weight: 600;
 }
 
-/* ── Field selector ── */
+
 .db-field-selector {
     position: relative;
     margin-bottom: 16px;
@@ -684,9 +674,7 @@
     color: #aaa;
 }
 
-/* ================================================================
-   SENSOR CARD
-   ================================================================ */
+
 .db-sensor-card {
     background: #fff;
     border-radius: 22px;
@@ -772,7 +760,7 @@
     text-align: center;
 }
 
-/* ── Sensor grid ── */
+
 .db-sensors {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -795,7 +783,7 @@
     background: #fcfcfc;
 }
 
-/* Colour states */
+
 .db-sensor--ok svg {
     color: #0c5e4a;
 }
@@ -850,9 +838,7 @@
     opacity: 0.55;
 }
 
-/* ================================================================
-   AI ANALYSIS
-   ================================================================ */
+
 .db-ai {
     background: #fff;
     border-radius: 20px;
@@ -862,7 +848,7 @@
     position: relative;
     overflow: hidden;
     cursor: pointer;
-    /* Smooth morphing — no bounce */
+    
     transition:
         border-radius  380ms var(--ease-out-expo, cubic-bezier(0.19,1,0.22,1)),
         padding        340ms var(--ease-out-expo, cubic-bezier(0.19,1,0.22,1)),
@@ -875,7 +861,7 @@
     box-shadow: 0 6px 22px rgba(12, 94, 74, 0.17);
 }
 
-/* Animated gradient border */
+
 .db-ai::before {
     content: '';
     position: absolute;
@@ -980,7 +966,7 @@
 .db-ai__result {
     margin: 0;
     display: grid;
-    /* animation set dynamically in JSX to sync with text length */
+    
 }
 
 .db-ai__result-inner {
@@ -993,7 +979,7 @@
     to   { grid-template-rows: 1fr; opacity: 1; transform: translateY(0); }
 }
 
-/* Per-character reveal — no bounce, slides up subtly */
+
 @keyframes charReveal {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -1004,12 +990,10 @@
     opacity: 0;
     white-space: pre-wrap;
     animation: charReveal 220ms var(--ease-out-expo, cubic-bezier(0.19,1,0.22,1)) forwards;
-    /* animationDelay set per-char via inline style */
+    
 }
 
-/* ================================================================
-   HARVEST PROGRESS
-   ================================================================ */
+
 .db-harvest {
     background: #fff;
     border-radius: 18px;
@@ -1058,9 +1042,7 @@
     transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ================================================================
-   CHART
-   ================================================================ */
+
 .db-range-tabs {
     display: flex;
     gap: 4px;
@@ -1187,9 +1169,7 @@
     color: var(--text-secondary) !important;
 }
 
-/* ================================================================
-   ANIMATIONS
-   ================================================================ */
+
 .animate-in {
     animation: fadeSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

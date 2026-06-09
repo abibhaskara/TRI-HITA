@@ -1,44 +1,18 @@
-/**
- * useMqtt.js
- * Custom hook — subscribes to ESP32 MQTT topics via WebSocket (browser-safe).
- *
- * Topics (must match Arduino code):
- *   esp32/tempidrus24  → temperature (°C)
- *   esp32/humidrus24   → humidity (%)
- *
- * HiveMQ public broker WebSocket endpoint:
- *   wss://broker.hivemq.com:8884/mqtt
- *
- * ── HOW DEVICE STATUS WORKS ──────────────────────────────────────────────
- * esp32Connected tracks whether the ESP32 *device* is actively sending data,
- * NOT whether the broker WebSocket is connected.
- *
- * ESP32 publishes every 5 seconds. If no message arrives within
- * DEVICE_TIMEOUT_MS (15s), the device is considered offline and all data
- * fields reset to null.
- * ─────────────────────────────────────────────────────────────────────────
- */
+
 import { useEffect, useState, useRef, useCallback } from 'react';
 import mqtt from 'mqtt';
 
-const BROKER_URL = 'wss://broker.hivemq.com:8884/mqtt';
+const BROKER_URL = import.meta.env.VITE_MQTT_BROKER_URL || 'wss://broker.hivemq.com:8884/mqtt';
 
 const TOPICS = {
-  temperature: 'tri-hita/esp32/temp_secret99',
-  humidity: 'tri-hita/esp32/hum_secret99',
+  temperature: import.meta.env.VITE_MQTT_TOPIC_TEMP || 'tri-hita/esp32/temp_secret99',
+  humidity: import.meta.env.VITE_MQTT_TOPIC_HUM || 'tri-hita/esp32/hum_secret99',
 };
 
-// Increase timeout to 30 seconds to be more robust against network lag
+
 const DEVICE_TIMEOUT_MS = 30_000;
 
-/**
- * @returns {{
- *   esp32Data: { temperature: number|null, humidity: number|null, lastSeen: Date|null },
- *   esp32Connected: boolean,   // true = ESP32 device is actively publishing
- *   brokerConnected: boolean,  // true = WebSocket to HiveMQ is open
- *   esp32Error: string|null,
- * }}
- */
+
 export function useMqtt() {
   const [esp32Data, setEsp32Data] = useState({
     temperature: null,
@@ -46,23 +20,23 @@ export function useMqtt() {
     lastSeen: null,
   });
 
-  // brokerConnected = WebSocket to HiveMQ is open
+  
   const [brokerConnected, setBrokerConnected] = useState(false);
-  // esp32Connected = ESP32 device is actively sending messages
+  
   const [esp32Connected, setEsp32Connected] = useState(false);
   const [esp32Error, setEsp32Error] = useState(null);
 
   const clientRef  = useRef(null);
-  const timeoutRef = useRef(null); // heartbeat timer
+  const timeoutRef = useRef(null); 
 
-  /** Mark device offline and wipe stale data */
+  
   const markDeviceOffline = useCallback(() => {
     console.warn('[MQTT] ESP32 device heartbeat timeout — marking offline');
     setEsp32Connected(false);
     setEsp32Data({ temperature: null, humidity: null, lastSeen: null });
   }, []);
 
-  /** Reset the 15-second heartbeat timer on every incoming message */
+  
   const resetHeartbeat = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(markDeviceOffline, DEVICE_TIMEOUT_MS);
@@ -97,20 +71,20 @@ export function useMqtt() {
     });
 
     mqttClient.on('message', (topic, payload, packet) => {
-      // Ignore "retained" messages. This prevents "ghost" data from appearing
-      // instantly upon connection/reconnection if the ESP32 is actually offline.
+      
+      
       if (packet && packet.retain) return;
 
       const value = parseFloat(payload.toString());
       if (isNaN(value)) return;
 
-      // First message after silence → device came online
+      
       setEsp32Connected(prev => {
         if (!prev) console.info('[MQTT] ESP32 device online — receiving data');
         return true;
       });
 
-      // Restart the heartbeat timer each time a message arrives
+      
       resetHeartbeat();
 
       setEsp32Data((prev) => {
@@ -124,15 +98,15 @@ export function useMqtt() {
     mqttClient.on('reconnect', () => {
       console.warn('[MQTT] Broker reconnecting…');
       setBrokerConnected(false);
-      // Heartbeat timer independently handles device offline detection
+      
     });
 
     mqttClient.on('offline', () => {
       console.warn('[MQTT] Broker client offline');
       setBrokerConnected(false);
-      // We don't mark the device offline immediately anymore.
-      // The heartbeat timer (DEVICE_TIMEOUT_MS) will handle it if the connection 
-      // doesn't recover within 30 seconds. This prevents status flickering.
+      
+      
+      
     });
 
     mqttClient.on('error', (err) => {
