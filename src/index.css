@@ -159,22 +159,14 @@ html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
-  background-color: #ffffff;
-  background-image: linear-gradient(to bottom, #04241d 50%, #ffffff 50%);
-  background-repeat: no-repeat;
+  background-color: #f3f4f0;
   overscroll-behavior: none;
 }
 
 body {
   font-family: var(--font-body);
   color: var(--text-primary);
-  background: radial-gradient(circle at 50% 50%, #07352b 0%, #031410 100%);
-  background-image: 
-    radial-gradient(rgba(42, 209, 171, 0.08) 1px, transparent 1px),
-    radial-gradient(circle at 50% 50%, #07352b 0%, #031410 100%);
-  background-size: 24px 24px, 100% 100%;
-  background-attachment: fixed;
+  background-color: #f3f4f0;
   font-size: var(--text-base);
   line-height: 1.5;
   overflow-x: hidden;
@@ -487,6 +479,7 @@ button:active,
 
 .toggle {
   position: relative;
+  display: inline-block;
   width: 52px;
   height: 28px;
   flex-shrink: 0;

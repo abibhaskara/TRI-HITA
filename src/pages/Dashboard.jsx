@@ -307,7 +307,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
 
         
         <div className="db-section-hd">
-          <span className="db-section-title">{t('your_field')}</span>
+          <span className="section-title">{t('your_field')}</span>
           <span className="db-section-tag">{realWeather.description || t('live_data')}</span>
         </div>
 
@@ -442,7 +442,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
 
         
         <div className="db-section-hd" style={{ marginTop: 8 }}>
-          <span className="db-section-title">{t('harvest_progress')}</span>
+          <span className="section-title">{t('harvest_progress')}</span>
           <span className="db-section-tag">{harvestInfo.daysToHarvest} {t('days_left')}</span>
         </div>
 
@@ -459,7 +459,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
 
         
         <div className="db-section-hd" style={{ marginTop: 8 }}>
-          <span className="db-section-title">{t('sensor_history')}</span>
+          <span className="section-title">{t('sensor_history')}</span>
           <div className="db-range-wrap">
             <div className="db-range-tabs">
               {TIME_RANGES.map(r => (

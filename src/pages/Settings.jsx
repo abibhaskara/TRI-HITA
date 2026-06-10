@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
 import {
   Settings as SettingsIcon, Bell, Globe, Info, RefreshCw,
-  Sliders, ChevronRight, Battery, Wifi, Shield, LogOut,
-  User, MapPin, Compass,
+  Sliders, ChevronRight, Wifi, Shield, LogOut,
+  User, MapPin, Compass, Wrench
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { useUser } from '../context/UserContext';
@@ -63,9 +63,7 @@ export default function Settings() {
                         <h1 className="page-hero__title">{t('settings_title')}</h1>
                         <p className="page-hero__sub">{t('system_config')}</p>
                     </div>
-                    <div className="settings__header-icon">
-                        <SettingsIcon size={20} strokeWidth={1.5} />
-                    </div>
+                    <SettingsIcon size={20} strokeWidth={1.5} style={{ color: 'rgba(255, 255, 255, 0.8)' }} />
                 </div>
             </div>
 
@@ -92,8 +90,8 @@ export default function Settings() {
                 
                 <div className="section animate-in animate-delay-4">
                     <div className="section-header">
-                        <span className="section-title">
-                            <Bell size={14} strokeWidth={1.5} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+                        <span className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Bell size={16} strokeWidth={1.5} />
                             {t('notifications')}
                         </span>
                         {unreadAlertCount > 0 && (
@@ -154,7 +152,10 @@ export default function Settings() {
                 
                 <div className="section animate-in">
                     <div className="section-header">
-                        <span className="section-title">{t('system')}</span>
+                        <span className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Wrench size={16} strokeWidth={1.5} />
+                            {t('system')}
+                        </span>
                     </div>
                     <div className="settings__options-group glass-card">
                         <div className="settings__option-row">
@@ -185,15 +186,9 @@ export default function Settings() {
                         </div>
                         <div className="settings__divider" />
                         <div className="settings__option-row">
-                            <Battery size={16} strokeWidth={1.5} className="settings__option-icon--sm" />
-                            <span className="settings__option-label">{t('battery')}</span>
-                            <span className="settings__option-value">—</span>
-                        </div>
-                        <div className="settings__divider" />
-                        <div className="settings__option-row">
                             <Shield size={16} strokeWidth={1.5} className="settings__option-icon--sm" />
                             <span className="settings__option-label">{t('firmware')}</span>
-                            <span className="settings__option-value">v2.4.1</span>
+                            <span className="settings__option-value">V.1.1.1</span>
                         </div>
                     </div>
                 </div>
@@ -290,7 +285,7 @@ export default function Settings() {
                         <div>
                             <span className="settings__about-title">TRI-HITA</span>
                             <span className="settings__about-desc">{t('about_desc')}</span>
-                            <span className="settings__about-version">Version 1.0.0 • © 2026</span>
+                            <span className="settings__about-version">Version 1.1.1 • © 2026</span>
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
-import { Brain, ChevronRight, MapPin, TrendingUp, AlertTriangle, ShieldCheck, Loader, Sun } from 'lucide-react';
+import { FileText, ChevronRight, MapPin, TrendingUp, AlertTriangle, ShieldCheck, Loader, Sun } from 'lucide-react';
 import { AreaChart, Area, XAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { useData } from '../context/DataContext';
 import { useUser } from '../context/UserContext';
@@ -112,9 +112,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
             <h1 className="page-hero__title">{t('ai_analysis')}</h1>
             <p className="page-hero__sub">{t('smart_insights')}</p>
           </div>
-          <div className="analysis__brain-badge">
-            <Brain size={20} strokeWidth={1.5} />
-          </div>
+          <FileText size={20} strokeWidth={1.5} style={{ color: 'rgba(255, 255, 255, 0.8)' }} />
         </div>
       </div>
 
@@ -124,7 +122,7 @@ IMPORTANT: Write entirely in ${lang === 'id' ? 'Indonesian (Bahasa Indonesia)' :
         
         <div className="section animate-in animate-delay-1">
           <div className="pg-section-header">
-            <span className="pg-section-title">{t('weather_forecast')}</span>
+            <span className="section-title">{t('weather_forecast')}</span>
             <div className="forecast-loc">
               <MapPin size={11} />
               <span>

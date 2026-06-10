@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Camera, Mail, Lock, User, KeyRound, Check, RefreshCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Camera, Mail, Lock, User, KeyRound, Check, RefreshCcw } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { useLang } from '../context/LanguageContext';
 
@@ -11,6 +11,7 @@ export default function Account() {
   const { t } = useLang();
   const navigate = useNavigate();
 
+  const [plantationExpanded, setPlantationExpanded] = useState(false);
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [photoUrl, setPhotoUrl] = useState(user?.avatarUrl || 'https://api.dicebear.com/9.x/thumbs/svg?seed=Sophie');
@@ -72,23 +73,6 @@ export default function Account() {
 
   return (
     <div className="page account-page">
-      
-      <div className="page-hero animate-in">
-        <div className="page-hero__top">
-          <button className="back-btn" onClick={() => navigate('/')} aria-label="Go back">
-            <ChevronLeft size={24} />
-          </button>
-          <div className="page-hero__info-wrap">
-            <div className="page-hero__label">Tri-Hita</div>
-            <h1 className="page-hero__title">{t('account')}</h1>
-            <p className="page-hero__sub">{t('manage_profile_desc', 'Manage your profile and plantation setup')}</p>
-          </div>
-          <div className="settings__header-icon">
-            <User size={20} strokeWidth={1.5} />
-          </div>
-        </div>
-      </div>
-
       <div className="account-content animate-in">
         <div className="profile-section">
           <div className="avatar-wrap">
@@ -104,157 +88,191 @@ export default function Account() {
           <p className="profile-email">{email || 'farmer@tri-hita.ai'}</p>
         </div>
 
-        <div className="settings-group">
-          <div className="setting-item">
-            <label><User size={16} /> {t('full_name')}</label>
-            <input 
-              type="text" 
-              value={name} 
-              onChange={(e) => setName(e.target.value)} 
-              placeholder={t('enter_your_name')}
-            />
-          </div>
-
-          <div className="setting-item">
-            <label><Mail size={16} /> {t('email')}</label>
-            <input 
-              type="email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              placeholder="your@email.com"
-            />
-          </div>
-
-          <div className="setting-item">
-            <label><Lock size={16} /> {t('password')}</label>
-            <div className="password-input-wrap">
+        <h2 className="section-title settings-section-title">
+          {t('profile_settings', 'Pengaturan Profil')}
+        </h2>
+        
+        <div className="bento-grid">
+          <div className="bento-card bento-card--full">
+            <div className="setting-item">
+              <label><User size={16} /> {t('full_name')}</label>
               <input 
-                type="password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                placeholder="••••••••"
+                type="text" 
+                value={name} 
+                onChange={(e) => setName(e.target.value)} 
+                placeholder={t('enter_your_name')}
               />
-              <button 
-                className={`reset-btn ${isResetting ? 'resetting' : ''}`} 
-                onClick={handleResetPassword} 
-                disabled={isResetting}
-              >
-                {isResetting ? <RefreshCcw size={14} className="spin-anim" /> : <KeyRound size={14} />}
-                <span>{t('reset')}</span>
-              </button>
+            </div>
+
+            <div className="setting-item" style={{ marginBottom: 0 }}>
+              <label><Mail size={16} /> {t('email')}</label>
+              <input 
+                type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                placeholder="your@email.com"
+              />
+            </div>
+          </div>
+
+          <div className="bento-card bento-card--full">
+            <div className="setting-item" style={{ marginBottom: 0 }}>
+              <label><Lock size={16} /> {t('password')}</label>
+              <div className="password-input-wrap">
+                <input 
+                  type="password" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  placeholder="••••••••"
+                />
+                <button 
+                  className={`reset-btn ${isResetting ? 'resetting' : ''}`} 
+                  onClick={handleResetPassword} 
+                  disabled={isResetting}
+                >
+                  {isResetting ? <RefreshCcw size={14} className="spin-anim" /> : <KeyRound size={14} />}
+                  <span>{t('reset')}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <h2 className="settings-section-title">
-          {t('plantation_setup')}
-        </h2>
+        <button
+          className="plantation-toggle-btn"
+          onClick={() => setPlantationExpanded(v => !v)}
+          aria-expanded={plantationExpanded}
+        >
+          <h2 className="section-title settings-section-title">
+            {t('plantation_setup')}
+          </h2>
+          <ChevronRight 
+            size={18} 
+            className={`plantation-toggle-chevron ${plantationExpanded ? 'plantation-toggle-chevron--open' : ''}`} 
+          />
+        </button>
 
-        <div className="settings-group">
-          <div className="setting-item">
-            <label>{t('crop_name')}</label>
-            <input 
-              type="text" 
-              value={cropName} 
-              onChange={(e) => setCropName(e.target.value)} 
-            />
-          </div>
+        <div className={`plantation-setup-collapse ${plantationExpanded ? 'plantation-setup-collapse--expanded' : ''}`}>
+          <div className="plantation-setup-inner">
+            <div className="bento-grid">
+              <div className="bento-card">
+                <div className="setting-item">
+                  <label>{t('crop_name')}</label>
+                  <input 
+                    type="text" 
+                    value={cropName} 
+                    onChange={(e) => setCropName(e.target.value)} 
+                  />
+                </div>
 
-          <div className="setting-item">
-            <label>{t('variety')}</label>
-            <input 
-              type="text" 
-              value={varietyLabel} 
-              onChange={(e) => setVarietyLabel(e.target.value)} 
-            />
-          </div>
-
-          <div className="setting-item">
-            <label>{t('growth_stage')}</label>
-            <select 
-              value={growthStage} 
-              onChange={(e) => setGrowthStage(e.target.value)}
-              className="settings__select"
-            >
-              <option value="nursery">{t('nursery')}</option>
-              <option value="vegetative">{t('vegetative')}</option>
-              <option value="generative">{t('generative')}</option>
-              <option value="harvest_stage">{t('harvest_stage')}</option>
-            </select>
-          </div>
-
-          <div className="setting-item">
-            <label>{t('planted_date')}</label>
-            <input 
-              type="date" 
-              value={plantedAt} 
-              onChange={(e) => setPlantedAt(e.target.value)} 
-            />
-          </div>
-
-          <div className="setting-item">
-            <label>{t('cycle_duration')}</label>
-            <input 
-              type="number" 
-              value={cycleDays} 
-              onChange={(e) => setCycleDays(e.target.value)} 
-            />
-          </div>
-
-          <div className="setting-item">
-            <label>{t('irrigation_method')}</label>
-            <select 
-              value={irrigationMethod} 
-              onChange={(e) => setIrrigationMethod(e.target.value)}
-              className="settings__select"
-            >
-              <option value="drip_irrigation">{t('drip_irrigation')}</option>
-              <option value="sprinkler_irrigation">{t('sprinkler_irrigation')}</option>
-              <option value="manual_irrigation">{t('manual_irrigation')}</option>
-              <option value="rainfed_irrigation">{t('rainfed_irrigation')}</option>
-            </select>
-          </div>
-
-          <div className="setting-item" style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <label style={{ margin: 0 }}>{t('custom_thresholds')}</label>
-            <label className="toggle">
-              <input 
-                type="checkbox" 
-                checked={useCustomThresholds} 
-                onChange={(e) => setUseCustomThresholds(e.target.checked)} 
-              />
-              <span className="toggle-slider" />
-            </label>
-          </div>
-
-          {useCustomThresholds && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, width: '100%' }}>
-              <div className="setting-item">
-                <label>{t('optimal_moisture')} (%)</label>
-                <input 
-                  type="number" 
-                  value={optimalMoisture} 
-                  onChange={(e) => setOptimalMoisture(e.target.value)} 
-                />
+                <div className="setting-item" style={{ marginBottom: 0 }}>
+                  <label>{t('variety')}</label>
+                  <input 
+                    type="text" 
+                    value={varietyLabel} 
+                    onChange={(e) => setVarietyLabel(e.target.value)} 
+                  />
+                </div>
               </div>
-              <div className="setting-item">
-                <label>{t('optimal_temp')} (°C)</label>
-                <input 
-                  type="number" 
-                  value={optimalTemp} 
-                  onChange={(e) => setOptimalTemp(e.target.value)} 
-                />
+
+              <div className="bento-card">
+                <div className="setting-item" style={{ marginBottom: 0, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <label>{t('growth_stage')}</label>
+                  <select 
+                    value={growthStage} 
+                    onChange={(e) => setGrowthStage(e.target.value)}
+                    className="settings__select"
+                    style={{ marginTop: 'auto' }}
+                  >
+                    <option value="nursery">{t('nursery')}</option>
+                    <option value="vegetative">{t('vegetative')}</option>
+                    <option value="generative">{t('generative')}</option>
+                    <option value="harvest_stage">{t('harvest_stage')}</option>
+                  </select>
+                </div>
               </div>
-              <div className="setting-item" style={{ gridColumn: 'span 2' }}>
-                <label>{t('optimal_humidity')} (%)</label>
-                <input 
-                  type="number" 
-                  value={optimalHumidity} 
-                  onChange={(e) => setOptimalHumidity(e.target.value)} 
-                />
+
+              <div className="bento-card">
+                <div className="setting-item">
+                  <label>{t('planted_date')}</label>
+                  <input 
+                    type="date" 
+                    value={plantedAt} 
+                    onChange={(e) => setPlantedAt(e.target.value)} 
+                  />
+                </div>
+
+                <div className="setting-item" style={{ marginBottom: 0 }}>
+                  <label>{t('cycle_duration')}</label>
+                  <input 
+                    type="number" 
+                    value={cycleDays} 
+                    onChange={(e) => setCycleDays(e.target.value)} 
+                  />
+                </div>
+              </div>
+
+              <div className="bento-card">
+                <div className="setting-item" style={{ marginBottom: 0, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <label>{t('irrigation_method')}</label>
+                  <select 
+                    value={irrigationMethod} 
+                    onChange={(e) => setIrrigationMethod(e.target.value)}
+                    className="settings__select"
+                    style={{ marginTop: 'auto' }}
+                  >
+                    <option value="drip_irrigation">{t('drip_irrigation')}</option>
+                    <option value="sprinkler_irrigation">{t('sprinkler_irrigation')}</option>
+                    <option value="manual_irrigation">{t('manual_irrigation')}</option>
+                    <option value="rainfed_irrigation">{t('rainfed_irrigation')}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="bento-card bento-card--full">
+                <div className="setting-item" style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', display: 'flex', marginBottom: useCustomThresholds ? 'var(--space-lg)' : 0 }}>
+                  <label style={{ margin: 0 }}>{t('custom_thresholds')}</label>
+                  <label className="toggle">
+                    <input 
+                      type="checkbox" 
+                      checked={useCustomThresholds} 
+                      onChange={(e) => setUseCustomThresholds(e.target.checked)} 
+                    />
+                    <span className="toggle-slider" />
+                  </label>
+                </div>
+
+                {useCustomThresholds && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, width: '100%' }}>
+                    <div className="setting-item">
+                      <label>{t('optimal_moisture')} (%)</label>
+                      <input 
+                        type="number" 
+                        value={optimalMoisture} 
+                        onChange={(e) => setOptimalMoisture(e.target.value)} 
+                      />
+                    </div>
+                    <div className="setting-item">
+                      <label>{t('optimal_temp')} (°C)</label>
+                      <input 
+                        type="number" 
+                        value={optimalTemp} 
+                        onChange={(e) => setOptimalTemp(e.target.value)} 
+                      />
+                    </div>
+                    <div className="setting-item" style={{ gridColumn: 'span 2', marginBottom: 0 }}>
+                      <label>{t('optimal_humidity')} (%)</label>
+                      <input 
+                        type="number" 
+                        value={optimalHumidity} 
+                        onChange={(e) => setOptimalHumidity(e.target.value)} 
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          )}
+          </div>
         </div>
 
         <div className="account-actions">
