@@ -9,6 +9,13 @@ import { useUser } from '../context/UserContext';
 import { useLang } from '../context/LanguageContext';
 import './Settings.css';
 
+async function forceIrrigate() {
+    for (let i = 0; i < 10; i++) {
+        fetch("http://10.199.182.198/flush");
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+}
+
 export default function Settings() {
     const { alerts, unreadAlertCount, markAlertRead, locationConfig, updateLocationConfig } = useData();
     const { user, logout } = useUser();
@@ -86,6 +93,23 @@ export default function Settings() {
                         </label>
                     </div>
                 </div>
+
+                <div className="section animate-in animate-delay-2">
+                    <div className="glass-card settings__option" onClick={forceIrrigate}>
+                        <div className="settings__option-info">
+                            <Sliders size={18} strokeWidth={1.5} className="settings__option-icon" />
+                            <div>
+                                <span className="settings__option-label">Test Irrigate</span>
+                                <span className="settings__option-desc">💧💧💧</span>
+                            </div>
+                        </div>
+                        {/* <label className="toggle">
+                            <input type="checkbox" checked={autoIrrigation} onChange={() => setAutoIrrigation(v => !v)} />
+                            <span className="toggle-slider" />
+                        </label> */}
+                    </div>
+                </div>
+
 
                 
                 <div className="section animate-in animate-delay-4">
